@@ -21,7 +21,8 @@ export default function ConnectPage() {
     setSuccessMsg(null);
 
     try {
-      const base = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      // Use shared API base util behavior: same-origin by default if env not set.
+      const base = process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || "";
       const endpoint =
         provider === "jira"
           ? "/integrations/jira/connect"
@@ -31,22 +32,39 @@ export default function ConnectPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Public access: no Authorization header
         },
       });
 
+      // Handle non-2xx with best-effort message extraction
       if (!res.ok) {
-        // Try to surface backend message if present
         let message = `Failed to connect to ${provider === "jira" ? "JIRA" : "Confluence"}`;
+        // Try JSON body first (FastAPI default error shape), then text
         try {
-          const text = await res.text();
-          if (text) message = text;
+          const data = await res.json();
+          if (data && typeof data === "object" && "detail" in data) {
+            const detail = (data as { detail?: unknown }).detail;
+            if (typeof detail === "string" && detail.trim()) {
+              message = detail;
+            } else if (Array.isArray(detail)) {
+              const msgs = detail
+                .map((d) => (typeof d === "object" && d && "msg" in d ? String((d as { msg?: unknown }).msg ?? "") : ""))
+                .filter(Boolean)
+                .join(", ");
+              if (msgs) message = msgs;
+            }
+          }
         } catch {
-          /* ignore */
+          try {
+            const txt = await res.text();
+            if (txt && txt.trim()) message = txt;
+          } catch {
+            /* ignore */
+          }
         }
         throw new Error(message);
       }
 
+      // Parse success response safely
       const data: {
         provider: string;
         base_url: string;
@@ -54,7 +72,7 @@ export default function ConnectPage() {
         redirect_url?: string | null;
       } = await res.json();
 
-      if (!data.connected) {
+      if (!data?.connected) {
         throw new Error("Connection not confirmed by server.");
       }
 
@@ -62,11 +80,16 @@ export default function ConnectPage() {
         `${provider === "jira" ? "JIRA" : "Confluence"} connected successfully. Redirecting...`
       );
 
-      // Prefer local pages as requested. If needed later, we may use data.redirect_url.
+      // Prefer local pages; no hard navigation until we show success to user
       const target = provider === "jira" ? "/jira" : "/confluence";
-      setTimeout(() => router.push(target), 250);
+      // Slightly longer delay so users can see the success before navigation
+      setTimeout(() => {
+        // Defensive: only navigate to known routes that exist in app to avoid 404
+        router.push(target);
+      }, 500);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to connect.";
+      // Surface error to UI; do not navigate to avoid 404 on failure
       setError(message);
     } finally {
       setLoading(null);

@@ -26,6 +26,7 @@ export default function Sidebar() {
         <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Navigation</div>
         <div className="flex flex-col gap-1">
           <NavItem href="/" label="Overview" />
+          {/* These routes are implemented under app/jira, app/confluence, app/connect */}
           <NavItem href="/jira" label="JIRA Projects" />
           <NavItem href="/confluence" label="Confluence Pages" />
           <NavItem href="/connect" label="Connect Accounts" />
