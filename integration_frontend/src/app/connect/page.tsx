@@ -1,99 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
 
 /**
  * ConnectPage
- * One-click connect buttons calling public backend endpoints. No auth required.
+ *
+ * Updated to start OAuth by navigating to backend login endpoints:
+ * - JIRA:        GET {BACKEND}/auth/jira/login
+ * - Confluence:  GET {BACKEND}/auth/confluence/login
+ *
+ * The backend will redirect the browser to Atlassian, and later to a frontend callback page, e.g.:
+ * - Frontend callback routes implemented: /oauth/jira and /oauth/confluence
+ *
+ * We store transient UI state (loading + last outcome) to provide feedback. The definitive
+ * success/failure is parsed in the callback pages and can be relayed back via query params.
  */
 export default function ConnectPage() {
-  const router = useRouter();
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <ConnectInner />
+    </Suspense>
+  );
+}
+
+function ConnectInner() {
+  const params = useSearchParams();
 
   const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  async function handleConnect(provider: "jira" | "confluence") {
+  // If user returned here from callback with query flags, surface them.
+  useEffect(() => {
+    const status = params.get("status");
+    const provider = params.get("provider");
+    const message = params.get("message");
+
+    if (status === "success" && provider) {
+      setSuccessMsg(`${provider === "jira" ? "JIRA" : "Confluence"} connected successfully.`);
+    } else if (status === "error") {
+      setError(message || "Authorization failed. Please try again.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Start OAuth: we simply redirect the browser to backend /auth/<provider>/login.
+   * Backend handles crafting the Atlassian authorization URL and state.
+   *
+   * Note: We include a return_url hint so backend can send user back to our callback page.
+   * If backend already knows the callback, this param will be ignored safely.
+   */
+  function startOAuth(provider: "jira" | "confluence") {
     setLoading(provider);
     setError(null);
     setSuccessMsg(null);
 
-    try {
-      // Use shared API base util behavior: same-origin by default if env not set.
-      const base = process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || "";
-      const endpoint =
-        provider === "jira"
-          ? "/integrations/jira/connect"
-          : "/integrations/confluence/connect";
+    const base = process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || "";
+    const loginPath =
+      provider === "jira" ? "/auth/jira/login" : "/auth/confluence/login";
 
-      const res = await fetch(`${base}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    // The frontend callback pages we implement below:
+    const callbackUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/oauth/${provider}`
+        : `/oauth/${provider}`;
 
-      // Handle non-2xx with best-effort message extraction
-      if (!res.ok) {
-        let message = `Failed to connect to ${provider === "jira" ? "JIRA" : "Confluence"}`;
-        // Try JSON body first (FastAPI default error shape), then text
-        try {
-          const data = await res.json();
-          if (data && typeof data === "object" && "detail" in data) {
-            const detail = (data as { detail?: unknown }).detail;
-            if (typeof detail === "string" && detail.trim()) {
-              message = detail;
-            } else if (Array.isArray(detail)) {
-              const msgs = detail
-                .map((d) => (typeof d === "object" && d && "msg" in d ? String((d as { msg?: unknown }).msg ?? "") : ""))
-                .filter(Boolean)
-                .join(", ");
-              if (msgs) message = msgs;
-            }
-          }
-        } catch {
-          try {
-            const txt = await res.text();
-            if (txt && txt.trim()) message = txt;
-          } catch {
-            /* ignore */
-          }
-        }
-        throw new Error(message);
-      }
+    const url = new URL(`${base}${loginPath}`);
+    url.searchParams.set("state", "kc-oauth"); // optional marker
+    url.searchParams.set("scope", "read");
+    url.searchParams.set("return_url", callbackUrl);
 
-      // Parse success response safely
-      const data: {
-        provider: string;
-        base_url: string;
-        connected: boolean;
-        redirect_url?: string | null;
-      } = await res.json();
-
-      if (!data?.connected) {
-        throw new Error("Connection not confirmed by server.");
-      }
-
-      setSuccessMsg(
-        `${provider === "jira" ? "JIRA" : "Confluence"} connected successfully. Redirecting...`
-      );
-
-      // Prefer local pages; no hard navigation until we show success to user
-      const target = provider === "jira" ? "/jira" : "/confluence";
-      // Slightly longer delay so users can see the success before navigation
-      setTimeout(() => {
-        // Defensive: only navigate to known routes that exist in app to avoid 404
-        router.push(target);
-      }, 500);
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to connect.";
-      // Surface error to UI; do not navigate to avoid 404 on failure
-      setError(message);
-    } finally {
-      setLoading(null);
-    }
+    // Navigate away to start OAuth; the browser will leave this app and come back after authorization.
+    window.location.href = url.toString();
   }
 
   return (
@@ -101,8 +82,7 @@ export default function ConnectPage() {
       <div>
         <h1 className="text-2xl font-semibold">Connect Integrations</h1>
         <p className="text-gray-600 mt-1">
-          Connect to your JIRA and Confluence accounts. This demo requires no credentials—just click
-          Connect Now to initiate the backend flow.
+          Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow.
         </p>
       </div>
 
@@ -124,7 +104,7 @@ export default function ConnectPage() {
             <div>
               <h2 className="text-lg font-medium">JIRA</h2>
               <p className="text-sm text-gray-600">
-                Click Connect Now to connect using the backend flow.
+                Starts Atlassian OAuth via backend.
               </p>
             </div>
             <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
@@ -134,16 +114,16 @@ export default function ConnectPage() {
 
           <div className="mt-4">
             <button
-              onClick={() => handleConnect("jira")}
+              onClick={() => startOAuth("jira")}
               disabled={loading === "jira"}
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
             >
-              {loading === "jira" ? "Connecting..." : "Connect Now"}
+              {loading === "jira" ? "Redirecting..." : "Connect Now"}
             </button>
           </div>
 
           <div className="mt-3 text-sm text-gray-500">
-            On success, you will be redirected to JIRA projects.
+            You will be redirected to Atlassian to authorize, then returned here.
           </div>
         </div>
 
@@ -153,7 +133,7 @@ export default function ConnectPage() {
             <div>
               <h2 className="text-lg font-medium">Confluence</h2>
               <p className="text-sm text-gray-600">
-                Click Connect Now to connect using the backend flow.
+                Starts Atlassian OAuth via backend.
               </p>
             </div>
             <span className="text-xs px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200">
@@ -163,16 +143,16 @@ export default function ConnectPage() {
 
           <div className="mt-4">
             <button
-              onClick={() => handleConnect("confluence")}
+              onClick={() => startOAuth("confluence")}
               disabled={loading === "confluence"}
               className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
             >
-              {loading === "confluence" ? "Connecting..." : "Connect Now"}
+              {loading === "confluence" ? "Redirecting..." : "Connect Now"}
             </button>
           </div>
 
           <div className="mt-3 text-sm text-gray-500">
-            On success, you will be redirected to Confluence pages.
+            You will be redirected to Atlassian to authorize, then returned here.
           </div>
         </div>
       </div>
