@@ -52,7 +52,7 @@ function JiraOAuthCallbackInner() {
       ) : (
         <FeedbackAlert type="success" message={message} />
       )}
-      {status === "error" && (
+      {status === "error" ? (
         <div className="mt-4">
           <button
             className="btn btn-outline focus-ring"
@@ -60,6 +60,17 @@ function JiraOAuthCallbackInner() {
               router.replace(
                 "/connect?status=error&provider=jira&message=" + encodeURIComponent(message)
               )
+            }
+          >
+            Back to Connect
+          </button>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <button
+            className="btn btn-outline focus-ring"
+            onClick={() =>
+              router.replace("/connect?status=success&provider=jira")
             }
           >
             Back to Connect

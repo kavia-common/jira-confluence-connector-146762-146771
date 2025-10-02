@@ -3,19 +3,19 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
+import { buildOAuthLoginUrl } from "@/lib/oauth";
 
 /**
  * ConnectPage
  *
- * Updated to start OAuth by navigating to backend login endpoints:
+ * Starts OAuth by navigating to backend login endpoints:
  * - JIRA:        GET {BACKEND}/auth/jira/login
  * - Confluence:  GET {BACKEND}/auth/confluence/login
  *
- * The backend will redirect the browser to Atlassian, and later to a frontend callback page, e.g.:
- * - Frontend callback routes implemented: /oauth/jira and /oauth/confluence
+ * Backend redirects the browser to Atlassian, and later to a frontend callback page:
+ * - /oauth/jira and /oauth/confluence
  *
- * We store transient UI state (loading + last outcome) to provide feedback. The definitive
- * success/failure is parsed in the callback pages and can be relayed back via query params.
+ * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */
 export default function ConnectPage() {
   return (
@@ -47,34 +47,21 @@ function ConnectInner() {
   }, []);
 
   /**
-   * Start OAuth: we simply redirect the browser to backend /auth/<provider>/login.
-   * Backend handles crafting the Atlassian authorization URL and state.
-   *
-   * Note: We include a return_url hint so backend can send user back to our callback page.
-   * If backend already knows the callback, this param will be ignored safely.
+   * Start OAuth: redirect the browser to backend /auth/<provider>/login.
+   * We include a return_url hint so backend can send user back to our callback page.
    */
   function startOAuth(provider: "jira" | "confluence") {
     setLoading(provider);
     setError(null);
     setSuccessMsg(null);
 
-    const base = process.env.NEXT_PUBLIC_BACKEND_URL?.trim() || "";
-    const loginPath =
-      provider === "jira" ? "/auth/jira/login" : "/auth/confluence/login";
-
-    // The frontend callback pages we implement below:
     const callbackUrl =
       typeof window !== "undefined"
         ? `${window.location.origin}/oauth/${provider}`
         : `/oauth/${provider}`;
 
-    const url = new URL(`${base}${loginPath}`);
-    url.searchParams.set("state", "kc-oauth"); // optional marker
-    url.searchParams.set("scope", "read");
-    url.searchParams.set("return_url", callbackUrl);
-
-    // Navigate away to start OAuth; the browser will leave this app and come back after authorization.
-    window.location.href = url.toString();
+    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    window.location.href = url;
   }
 
   return (
