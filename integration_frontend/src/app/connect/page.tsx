@@ -3,16 +3,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { useAuth } from "@/lib/auth";
 
 /**
  * ConnectPage
- * Replaces credential forms with one-click connect buttons.
- * Calls backend connect endpoints directly. On success, redirects to target page.
+ * One-click connect buttons calling public backend endpoints. No auth required.
  */
 export default function ConnectPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
 
   const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +31,7 @@ export default function ConnectPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // If later we add real auth, inject Authorization header here.
+          // Public access: no Authorization header
         },
       });
 
@@ -81,19 +78,10 @@ export default function ConnectPage() {
       <div>
         <h1 className="text-2xl font-semibold">Connect Integrations</h1>
         <p className="text-gray-600 mt-1">
-          Connect to your JIRA and Confluence accounts. No credentials are required here—just click
+          Connect to your JIRA and Confluence accounts. This demo requires no credentials—just click
           Connect Now to initiate the backend flow.
         </p>
       </div>
-
-      {!isAuthenticated && (
-        <div className="mb-2">
-          <FeedbackAlert
-            type="error"
-            message="You must sign in before connecting providers."
-          />
-        </div>
-      )}
 
       {error && (
         <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />
@@ -124,7 +112,7 @@ export default function ConnectPage() {
           <div className="mt-4">
             <button
               onClick={() => handleConnect("jira")}
-              disabled={loading === "jira" || !isAuthenticated}
+              disabled={loading === "jira"}
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
             >
               {loading === "jira" ? "Connecting..." : "Connect Now"}
@@ -153,7 +141,7 @@ export default function ConnectPage() {
           <div className="mt-4">
             <button
               onClick={() => handleConnect("confluence")}
-              disabled={loading === "confluence" || !isAuthenticated}
+              disabled={loading === "confluence"}
               className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
             >
               {loading === "confluence" ? "Connecting..." : "Connect Now"}

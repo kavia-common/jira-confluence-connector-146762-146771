@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/lib/auth";
-import EmptyState from "@/components/EmptyState";
 
+/**
+ * PUBLIC_INTERFACE
+ * Home is the public landing page. No login required.
+ */
 export default function Home() {
-  const { isAuthenticated } = useAuth();
-
   return (
     <div className="max-w-screen-2xl mx-auto">
       <section className="grid md:grid-cols-3 gap-4 mb-4">
@@ -27,20 +27,12 @@ export default function Home() {
         </div>
       </section>
 
-      {!isAuthenticated ? (
-        <EmptyState
-          title="You are not signed in"
-          description="Sign in with your email to begin. This demo issues a temporary token."
-          action={<Link href="/login" className="btn btn-primary focus-ring">Go to Sign in</Link>}
-        />
-      ) : (
-        <div className="card p-4">
-          <h3 className="text-sm font-semibold mb-2">Welcome</h3>
-          <p className="text-sm text-gray-700">
-            Use the sidebar to navigate projects, pages, or connect your accounts.
-          </p>
-        </div>
-      )}
+      <div className="card p-4">
+        <h3 className="text-sm font-semibold mb-2">Welcome</h3>
+        <p className="text-sm text-gray-700">
+          This application is publicly accessible. Use the sidebar to navigate projects, pages, or manage connections.
+        </p>
+      </div>
     </div>
   );
 }

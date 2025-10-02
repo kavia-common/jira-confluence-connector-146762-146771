@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react";
-import { useAuth } from "@/lib/auth";
 import { getApiBaseUrl } from "@/lib/api";
 
 export default function SettingsPage() {
-  const { user, isAuthenticated } = useAuth();
   const baseUrl = getApiBaseUrl();
 
   return (
@@ -14,14 +12,8 @@ export default function SettingsPage() {
         <h2 className="text-lg font-semibold mb-2">Settings</h2>
         <div className="space-y-3">
           <div>
-            <div className="text-sm font-medium mb-1">Authentication</div>
-            {isAuthenticated ? (
-              <div className="text-sm text-gray-700">
-                Signed in as <span className="font-medium">{user?.email}</span>
-              </div>
-            ) : (
-              <div className="text-sm text-gray-700">You are not signed in.</div>
-            )}
+            <div className="text-sm font-medium mb-1">Access</div>
+            <div className="text-sm text-gray-700">Public access enabled. No login required.</div>
           </div>
           <div>
             <div className="text-sm font-medium mb-1">Backend API Base URL</div>
