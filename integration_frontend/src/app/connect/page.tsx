@@ -1,92 +1,169 @@
 "use client";
 
 import React, { useState } from "react";
-import { connectJira, connectConfluence } from "@/lib/api";
+import { useRouter } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
 import { useAuth } from "@/lib/auth";
 
-function ConnectForm({
-  provider,
-  onSubmit,
-}: {
-  provider: "JIRA" | "Confluence";
-  // Accept any promise result since UI doesn't use the return value
-  onSubmit: (data: { base_url: string; access_token: string }) => Promise<unknown>;
-}) {
-  const [baseUrl, setBaseUrl] = useState("");
-  const [token, setToken] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setFeedback(null);
-    try {
-      await onSubmit({ base_url: baseUrl, access_token: token });
-      setFeedback({ type: "success", msg: `${provider} connection saved.` });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to save connection.";
-      setFeedback({ type: "error", msg: message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="card p-4">
-      <h3 className="text-sm font-semibold mb-2">{provider} Connection</h3>
-      {feedback && (
-        <div className="mb-3">
-          <FeedbackAlert type={feedback.type} message={feedback.msg} onClose={() => setFeedback(null)} />
-        </div>
-      )}
-      <form className="space-y-3" onSubmit={handleSubmit}>
-        <div>
-          <label className="label" htmlFor={`base_${provider}`}>Base URL</label>
-          <input
-            id={`base_${provider}`}
-            className="input"
-            placeholder={`https://your-${provider.toLowerCase()}.domain`}
-            value={baseUrl}
-            onChange={(e) => setBaseUrl(e.target.value)}
-            required
-            aria-required="true"
-          />
-        </div>
-        <div>
-          <label className="label" htmlFor={`token_${provider}`}>Access Token / API Key</label>
-          <input
-            id={`token_${provider}`}
-            className="input"
-            placeholder="Token"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            required
-            aria-required="true"
-          />
-        </div>
-        <button className="btn btn-amber focus-ring" type="submit" disabled={loading}>
-          {loading ? "Saving..." : "Save Connection"}
-        </button>
-      </form>
-    </div>
-  );
-}
-
+/**
+ * ConnectPage
+ * Replaces credential forms with one-click connect buttons.
+ * Calls backend connect endpoints directly. On success, redirects to target page.
+ */
 export default function ConnectPage() {
+  const router = useRouter();
   const { isAuthenticated } = useAuth();
 
+  const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  async function handleConnect(provider: "jira" | "confluence") {
+    setLoading(provider);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const base = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      const endpoint =
+        provider === "jira"
+          ? "/integrations/jira/connect"
+          : "/integrations/confluence/connect";
+
+      const res = await fetch(`${base}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // If later we add real auth, inject Authorization header here.
+        },
+      });
+
+      if (!res.ok) {
+        // Try to surface backend message if present
+        let message = `Failed to connect to ${provider === "jira" ? "JIRA" : "Confluence"}`;
+        try {
+          const text = await res.text();
+          if (text) message = text;
+        } catch {
+          /* ignore */
+        }
+        throw new Error(message);
+      }
+
+      const data: {
+        provider: string;
+        base_url: string;
+        connected: boolean;
+        redirect_url?: string | null;
+      } = await res.json();
+
+      if (!data.connected) {
+        throw new Error("Connection not confirmed by server.");
+      }
+
+      setSuccessMsg(
+        `${provider === "jira" ? "JIRA" : "Confluence"} connected successfully. Redirecting...`
+      );
+
+      // Prefer local pages as requested. If needed later, we may use data.redirect_url.
+      const target = provider === "jira" ? "/jira" : "/confluence";
+      setTimeout(() => router.push(target), 250);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to connect.";
+      setError(message);
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
-    <div className="max-w-screen-lg mx-auto">
+    <div className="p-6 space-y-6 max-w-screen-lg mx-auto">
+      <div>
+        <h1 className="text-2xl font-semibold">Connect Integrations</h1>
+        <p className="text-gray-600 mt-1">
+          Connect to your JIRA and Confluence accounts. No credentials are required here—just click
+          Connect Now to initiate the backend flow.
+        </p>
+      </div>
+
       {!isAuthenticated && (
-        <div className="mb-4">
-          <FeedbackAlert type="error" message="You must sign in before connecting providers." />
+        <div className="mb-2">
+          <FeedbackAlert
+            type="error"
+            message="You must sign in before connecting providers."
+          />
         </div>
       )}
-      <div className="grid md:grid-cols-2 gap-4">
-        <ConnectForm provider="JIRA" onSubmit={(data) => connectJira(data)} />
-        <ConnectForm provider="Confluence" onSubmit={(data) => connectConfluence(data)} />
+
+      {error && (
+        <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />
+      )}
+      {successMsg && (
+        <FeedbackAlert
+          type="success"
+          message={successMsg}
+          onClose={() => setSuccessMsg(null)}
+        />
+      )}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* JIRA Card */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-medium">JIRA</h2>
+              <p className="text-sm text-gray-600">
+                Click Connect Now to connect using the backend flow.
+              </p>
+            </div>
+            <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
+              Integration
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => handleConnect("jira")}
+              disabled={loading === "jira" || !isAuthenticated}
+              className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
+            >
+              {loading === "jira" ? "Connecting..." : "Connect Now"}
+            </button>
+          </div>
+
+          <div className="mt-3 text-sm text-gray-500">
+            On success, you will be redirected to JIRA projects.
+          </div>
+        </div>
+
+        {/* Confluence Card */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-medium">Confluence</h2>
+              <p className="text-sm text-gray-600">
+                Click Connect Now to connect using the backend flow.
+              </p>
+            </div>
+            <span className="text-xs px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200">
+              Integration
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => handleConnect("confluence")}
+              disabled={loading === "confluence" || !isAuthenticated}
+              className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
+            >
+              {loading === "confluence" ? "Connecting..." : "Connect Now"}
+            </button>
+          </div>
+
+          <div className="mt-3 text-sm text-gray-500">
+            On success, you will be redirected to Confluence pages.
+          </div>
+        </div>
       </div>
     </div>
   );
