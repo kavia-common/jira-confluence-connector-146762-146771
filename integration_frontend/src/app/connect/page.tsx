@@ -13,7 +13,7 @@ import { buildOAuthLoginUrl } from "@/lib/oauth";
  * - Confluence:  GET {BACKEND}/auth/confluence/login
  *
  * Backend redirects the browser to Atlassian, and later to a frontend callback page:
- * - /oauth/jira and /oauth/confluence
+ * - /oauth/jira and /oauth/confluence (UI callback pages)
  *
  * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */
