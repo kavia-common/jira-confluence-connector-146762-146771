@@ -33,3 +33,6 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 - Helpers:
   - `@/lib/api` exposes getApiBaseUrl, fetchJiraProjects, and fetchConfluencePages.
   - `@/lib/oauth` exposes buildOAuthLoginUrl used by the Connect page.
+
+## OAuth Backend Endpoint
+The frontend constructs login URLs like `${NEXT_PUBLIC_BACKEND_URL}/auth/jira/login` with `return_url`, `state`, and `scope` query params. Ensure `NEXT_PUBLIC_BACKEND_URL` points to the running backend (typically port 3001). Do not include a trailing slash.

@@ -64,7 +64,12 @@ function ConnectInner() {
 
     console.log("callbackurl", callbackUrl)
 
-    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    const url = buildOAuthLoginUrl({
+      provider,
+      returnUrl: callbackUrl,
+      state: "kc-oauth",
+      scope: "read",
+    });
     window.location.href = url;
   }
 
