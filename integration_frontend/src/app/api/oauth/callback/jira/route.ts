@@ -34,23 +34,20 @@ export async function GET(req: NextRequest) {
   const code = searchParams.get("code");
   const state = searchParams.get("state") ?? undefined;
 
-  // Read envs (do not log secrets)
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, "");
-  const REDIRECT_URI = process.env.JIRA_OAUTH_REDIRECT_URI; // not used directly but available if needed
+  // Read envs (do not log secrets). Trim/normalize to avoid trailing slashes/spaces issues.
+  const BACKEND_BASE = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/*$/, "");
+  const REDIRECT_URI = (process.env.JIRA_OAUTH_REDIRECT_URI || "").trim(); // not used directly but available if needed
 
   // Basic validation
   if (!code) {
     return NextResponse.redirect(
-      new URL(
-        "/connect?status=error&provider=jira&reason=missing_code",
-        req.url
-      )
+      new URL("/connect?status=error&provider=jira&reason=missing_code", req.url)
     );
   }
 
   // Attempt to forward to backend if configured
   if (BACKEND_BASE) {
-    // Prefer explicit exchange endpoint (POST)
+    // Prefer explicit exchange endpoint (POST). This endpoint may not exist; errors are swallowed by design.
     const exchangeUrl = `${BACKEND_BASE}/auth/jira/exchange`;
     try {
       const body: Record<string, unknown> = { code };
@@ -78,9 +75,5 @@ export async function GET(req: NextRequest) {
   }
 
   // Always redirect back into the app UI with a success indicator; the UI can verify connection if desired
-  return NextResponse.redirect(
-    new URL("/connect?status=success&provider=jira", req.url)
-  );
+  return NextResponse.redirect(new URL("/connect?status=success&provider=jira", req.url));
 }
-
-
