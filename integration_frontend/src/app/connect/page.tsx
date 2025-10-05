@@ -60,9 +60,6 @@ function ConnectInner() {
       typeof window !== "undefined"
         ? `${window.location.origin}/oauth/${provider}`
         : `/oauth/${provider}`;
-        //debugger;
-
-    console.log("callbackurl", callbackUrl)
 
     const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
     window.location.href = url;
