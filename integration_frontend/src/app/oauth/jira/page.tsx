@@ -1,36 +1,83 @@
 "use client";
 
-import React, { useEffect } from "react";
-import Link from "next/link";
+import React, { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import FeedbackAlert from "@/components/FeedbackAlert";
 
 /**
  * PUBLIC_INTERFACE
- * OAuthJiraPage
- * Minimal placeholder page for /oauth/jira used as a return target after Atlassian authorization.
- * The backend will generally redirect to /api/oauth/callback/jira instead; this page exists to satisfy
- * legacy navigations and avoid build-time route errors.
+ * JiraOAuthCallbackPage
+ * Wraps the inner component that uses useSearchParams in a Suspense boundary,
+ * satisfying Next.js requirement.
  */
-export default function OAuthJiraPage() {
+export default function JiraOAuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Finalizing authorization...</div>}>
+      <JiraOAuthCallbackInner />
+    </Suspense>
+  );
+}
+
+function JiraOAuthCallbackInner() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const safeParams = params ?? new URLSearchParams();
+
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState<string>("Finalizing authorization...");
+
   useEffect(() => {
-    // No-op: this page can be enhanced to read query params and show status if needed.
+    const error = safeParams.get("error");
+    const msg = safeParams.get("message");
+
+    if (error) {
+      setStatus("error");
+      setMessage(msg || "Authorization failed.");
+      return;
+    }
+
+    setStatus("success");
+    setMessage("JIRA connected successfully. Redirecting to projects...");
+    const t = setTimeout(() => {
+      router.replace("/jira");
+    }, 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <main className="min-h-[60vh] flex items-center justify-center p-6">
-      <div className="max-w-lg w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm text-center">
-        <h1 className="text-xl font-semibold">Jira OAuth</h1>
-        <p className="text-gray-600 mt-2">
-          This page is a placeholder for the Jira OAuth flow. If you reached here directly, you can return to the Connect page.
-        </p>
-        <div className="mt-6">
-          <Link
-            href="/connect"
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
+    <div className="p-6 max-w-screen-md mx-auto">
+      <h1 className="text-2xl font-semibold mb-3">JIRA Authorization</h1>
+      {status === "error" ? (
+        <FeedbackAlert type="error" message={message} />
+      ) : (
+        <FeedbackAlert type="success" message={message} />
+      )}
+      {status === "error" ? (
+        <div className="mt-4">
+          <button
+            className="btn btn-outline focus-ring"
+            onClick={() =>
+              router.replace(
+                "/connect?status=error&provider=jira&message=" + encodeURIComponent(message)
+              )
+            }
           >
             Back to Connect
-          </Link>
+          </button>
         </div>
-      </div>
-    </main>
+      ) : (
+        <div className="mt-4">
+          <button
+            className="btn btn-outline focus-ring"
+            onClick={() =>
+              router.replace("/connect?status=success&provider=jira")
+            }
+          >
+            Back to Connect
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

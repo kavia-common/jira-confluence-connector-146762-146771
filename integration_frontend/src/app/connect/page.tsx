@@ -8,8 +8,14 @@ import { buildOAuthLoginUrl } from "@/lib/oauth";
 /**
  * ConnectPage
  *
- * Starts OAuth by redirecting to backend /api/oauth/start with optional return_url,
- * which then redirects to Atlassian. We use window.location.assign for a full-page redirect.
+ * Starts OAuth by navigating to backend login endpoints:
+ * - JIRA:        GET {BACKEND}/auth/jira/login
+ * - Confluence:  GET {BACKEND}/auth/confluence/login
+ *
+ * Backend redirects the browser to Atlassian, and later to a frontend callback page:
+ * - /oauth/jira and /oauth/confluence (UI callback pages)
+ *
+ * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */
 export default function ConnectPage() {
   return (
@@ -42,8 +48,8 @@ function ConnectInner() {
   }, []);
 
   /**
-   * Start OAuth: redirect the browser to backend /api/oauth/start.
-   * We include a return_url hint so backend can send user back to our frontend callback page.
+   * Start OAuth: redirect the browser to backend /auth/<provider>/login.
+   * We include a return_url hint so backend can send user back to our callback page.
    */
   function startOAuth(provider: "jira" | "confluence") {
     setLoading(provider);
@@ -52,19 +58,14 @@ function ConnectInner() {
 
     const callbackUrl =
       typeof window !== "undefined"
-        ? `${window.location.origin}/api/oauth/callback/jira`
-        : `/api/oauth/callback/jira`;
+        ? `${window.location.origin}/oauth/${provider}`
+        : `/oauth/${provider}`;
+        //debugger;
 
-    const startUrl = buildOAuthLoginUrl(callbackUrl);
-    if (!startUrl) {
-      setLoading(null);
-      setError(
-        "Backend URL is not configured. Please set NEXT_PUBLIC_BACKEND_URL to your cloud backend."
-      );
-      return;
-    }
-    // Full page navigation to backend start endpoint
-    window.location.assign(startUrl);
+    console.log("callbackurl", callbackUrl)
+
+    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    window.location.href = url;
   }
 
   return (
@@ -72,7 +73,7 @@ function ConnectInner() {
       <div>
         <h1 className="text-2xl font-semibold">Connect Integrations</h1>
         <p className="text-gray-600 mt-1">
-          Connect to your Atlassian account. Clicking Connect Now will open the backend OAuth start flow.
+          Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow.
         </p>
       </div>
 
@@ -93,7 +94,9 @@ function ConnectInner() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-medium">JIRA</h2>
-              <p className="text-sm text-gray-600">Starts Atlassian OAuth via backend.</p>
+              <p className="text-sm text-gray-600">
+                Starts Atlassian OAuth via backend.
+              </p>
             </div>
             <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
               Integration
@@ -120,7 +123,9 @@ function ConnectInner() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-medium">Confluence</h2>
-              <p className="text-sm text-gray-600">Starts Atlassian OAuth via backend.</p>
+              <p className="text-sm text-gray-600">
+                Starts Atlassian OAuth via backend.
+              </p>
             </div>
             <span className="text-xs px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200">
               Integration
