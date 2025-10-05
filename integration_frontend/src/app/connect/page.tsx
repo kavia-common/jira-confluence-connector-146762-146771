@@ -63,6 +63,13 @@ function ConnectInner() {
 
     // Build URL to backend Atlassian OAuth login, preserving a redirect hint back to our frontend
     const url = buildOAuthLoginUrl(callbackUrl);
+    if (!url) {
+      setLoading(null);
+      setError(
+        "Backend URL is not configured. Please set NEXT_PUBLIC_BACKEND_URL to your cloud backend."
+      );
+      return;
+    }
     window.location.href = url;
   }
 
