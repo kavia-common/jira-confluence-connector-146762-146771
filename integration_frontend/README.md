@@ -30,3 +30,6 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 - This frontend expects the backend API described by the provided OpenAPI (FastAPI).
 - Authorization bearer token is stored in localStorage (demo only).
 - Styling uses CSS variables and utility classes aligned with Ocean Professional theme.
+- Helpers:
+  - `@/lib/api` exposes getApiBaseUrl, fetchJiraProjects, and fetchConfluencePages.
+  - `@/lib/oauth` exposes buildOAuthLoginUrl used by the Connect page.
