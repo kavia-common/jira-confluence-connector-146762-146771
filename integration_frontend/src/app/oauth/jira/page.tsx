@@ -21,13 +21,14 @@ export default function JiraOAuthCallbackPage() {
 function JiraOAuthCallbackInner() {
   const router = useRouter();
   const params = useSearchParams();
+  const safeParams = params ?? new URLSearchParams();
 
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState<string>("Finalizing authorization...");
 
   useEffect(() => {
-    const error = params.get("error");
-    const msg = params.get("message");
+    const error = safeParams.get("error");
+    const msg = safeParams.get("message");
 
     if (error) {
       setStatus("error");

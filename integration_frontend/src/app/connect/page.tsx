@@ -27,6 +27,7 @@ export default function ConnectPage() {
 
 function ConnectInner() {
   const params = useSearchParams();
+  const safeParams = params ?? new URLSearchParams();
 
   const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,9 +35,9 @@ function ConnectInner() {
 
   // If user returned here from callback with query flags, surface them.
   useEffect(() => {
-    const status = params.get("status");
-    const provider = params.get("provider");
-    const message = params.get("message");
+    const status = safeParams.get("status");
+    const provider = safeParams.get("provider");
+    const message = safeParams.get("message");
 
     if (status === "success" && provider) {
       setSuccessMsg(`${provider === "jira" ? "JIRA" : "Confluence"} connected successfully.`);
@@ -59,6 +60,9 @@ function ConnectInner() {
       typeof window !== "undefined"
         ? `${window.location.origin}/oauth/${provider}`
         : `/oauth/${provider}`;
+        // debugger;
+
+    console.log("callbackurl", callbackUrl)
 
     const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
     window.location.href = url;
