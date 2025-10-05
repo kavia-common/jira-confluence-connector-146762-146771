@@ -61,7 +61,8 @@ function ConnectInner() {
         ? `${window.location.origin}/oauth/${provider}`
         : `/oauth/${provider}`;
 
-    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    // Build URL to backend Atlassian OAuth login, preserving a redirect hint back to our frontend
+    const url = buildOAuthLoginUrl(callbackUrl);
     window.location.href = url;
   }
 
