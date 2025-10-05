@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// This route participates in static export by disallowing dynamic rendering at build time,
+// but allows runtime execution during server runtime.
+export const dynamic = "error";
+// Set a small revalidate to be explicit, though route handlers are not statically generated.
+export const revalidate = 0;
+
 /**
  * PUBLIC_INTERFACE
  * GET /api/oauth/callback/jira

@@ -60,7 +60,7 @@ function ConnectInner() {
       typeof window !== "undefined"
         ? `${window.location.origin}/oauth/${provider}`
         : `/oauth/${provider}`;
-        // debugger;
+        //debugger;
 
     console.log("callbackurl", callbackUrl)
 
