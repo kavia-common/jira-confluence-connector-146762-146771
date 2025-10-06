@@ -61,6 +61,8 @@ function ConnectInner() {
         typeof window !== "undefined"
           ? `${window.location.origin}/oauth/${provider}`
           : `/oauth/${provider}`;
+          debugger;
+          console.log(callbackUrl)
 
       if (provider === "jira") {
         // Option A: request JSON { url } and redirect
