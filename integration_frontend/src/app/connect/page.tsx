@@ -6,16 +6,14 @@ import FeedbackAlert from "@/components/FeedbackAlert";
 import { getAtlassianAuthUrl } from "@/lib/oauth";
 
 /**
+ * PUBLIC_INTERFACE
  * ConnectPage
  *
- * Starts OAuth by navigating to backend PKCE endpoint:
- * - GET {BACKEND}/api/oauth/atlassian/login
- *
- * Backend redirects the browser to Atlassian, and later to the configured backend callback
- * at `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/atlassian/callback` which will then
- * redirect back to frontend pages like /oauth/jira or /oauth/confluence.
- *
- * We surface transient UI state (loading + last outcome) based on query flags after callback.
+ * Connects JIRA/Confluence by starting the Atlassian OAuth flow and uses this page (/connect) as the return page.
+ * - Builds an absolute returnUrl to this page (/connect) on the client.
+ * - Uses getAtlassianAuthUrl({ returnUrl }) to retrieve the authorization URL from the backend.
+ * - Redirects the browser to Atlassian on button click.
+ * - Optionally displays status messages from query parameters (e.g., ?result=success|error&message=...).
  */
 export default function ConnectPage() {
   return (
@@ -26,65 +24,68 @@ export default function ConnectPage() {
 }
 
 function ConnectInner() {
-  const params = useSearchParams();
-  const safeParams = params ?? new URLSearchParams();
+  const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+  const [authUrl, setAuthUrl] = useState<string>("");
 
-  // If user returned here from callback with query flags, surface them.
+  // Prepare absolute return URL to this page (/connect) on the client only
   useEffect(() => {
-    const status = safeParams.get("status");
-    const provider = safeParams.get("provider");
-    const message = safeParams.get("message");
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || "";
+    if (!origin) return;
+    const returnUrl = `${origin.replace(/\/*$/, "")}/connect`;
 
-    if (status === "success" && provider) {
-      setSuccessMsg(`${provider === "jira" ? "JIRA" : "Confluence"} connected successfully.`);
-    } else if (status === "error") {
-      setError(message || "Authorization failed. Please try again.");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Precompute the authorization URL so we can redirect quickly on click
+    getAtlassianAuthUrl({ returnUrl })
+      .then((url) => {
+        setAuthUrl(url);
+        setReady(true);
+      })
+      .catch((e) => {
+        console.error(e);
+        setError(e?.message || "Failed to prepare authorization URL");
+      });
   }, []);
 
-  /**
-   * Start OAuth: request the backend PKCE login URL and navigate there.
-   * We pass a return_url hint so backend can route back to a frontend page after it completes.
-   */
-  async function startOAuth(provider: "jira" | "confluence") {
+  const handleConnectClick = async (provider: "jira" | "confluence") => {
     try {
       setLoading(provider);
       setError(null);
-      setSuccessMsg(null);
-
-      const frontendBase =
-        (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL ||
-          (typeof window !== "undefined" ? window.location.origin : "")).replace(/\/*$/, "");
-      const returnUrl = `${frontendBase}/oauth/${provider}`;
-
-      const url = await getAtlassianAuthUrl({
-        returnUrl,
-        state: "kc-oauth",
-      });
-
-      window.location.href = url;
-    } catch (e: unknown) {
-      console.error("Failed to start OAuth", e);
+      if (!authUrl) throw new Error("Authorization URL not ready");
+      window.location.href = authUrl;
+    } catch (e) {
       setLoading(null);
-      const msg =
-        typeof e === "object" && e !== null && "message" in e
-          ? String((e as { message?: string }).message || "")
-          : "";
-      setError(msg || "Failed to start OAuth. Please try again.");
+      const message =
+        e instanceof Error ? e.message : "Unable to start Atlassian OAuth";
+      setError(message);
     }
-  }
+  };
+
+  // Optional: display feedback from backend redirect parameters
+  const result = searchParams?.get("result"); // "success" | "error"
+  const message = searchParams?.get("message");
+
+  useEffect(() => {
+    if (!result) return;
+    if (result === "success") {
+      setSuccessMsg(message || "Connected to Atlassian successfully.");
+    } else if (result === "error") {
+      setError(message || "Failed to connect to Atlassian.");
+    }
+  }, [result, message]);
 
   return (
     <div className="p-6 space-y-6 max-w-screen-lg mx-auto">
       <div>
         <h1 className="text-2xl font-semibold">Connect Integrations</h1>
         <p className="text-gray-600 mt-1">
-          Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow.
+          Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow and return here.
         </p>
       </div>
 
@@ -116,8 +117,8 @@ function ConnectInner() {
 
           <div className="mt-4">
             <button
-              onClick={() => startOAuth("jira")}
-              disabled={loading === "jira"}
+              onClick={() => handleConnectClick("jira")}
+              disabled={!ready || loading === "jira"}
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
             >
               {loading === "jira" ? "Redirecting..." : "Connect Now"}
@@ -145,8 +146,8 @@ function ConnectInner() {
 
           <div className="mt-4">
             <button
-              onClick={() => startOAuth("confluence")}
-              disabled={loading === "confluence"}
+              onClick={() => handleConnectClick("confluence")}
+              disabled={!ready || loading === "confluence"}
               className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
             >
               {loading === "confluence" ? "Redirecting..." : "Connect Now"}
