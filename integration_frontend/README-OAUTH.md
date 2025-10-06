@@ -3,7 +3,7 @@
 To ensure the "Connect Now" button redirects correctly to Atlassian:
 
 - Set NEXT_PUBLIC_BACKEND_URL to the backend preview base URL (port 3001). Example:
-  NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-22488-beta.beta01.cloud.kavia.ai:3001
+  NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-26162-beta.beta01.cloud.kavia.ai:3001
 
 - The frontend constructs the backend login URL using the helper at `@/lib/oauth`:
   buildOAuthLoginUrl("jira" | "confluence", `${window.location.origin}/oauth/<service>`, "optional-state", "optional-scope")

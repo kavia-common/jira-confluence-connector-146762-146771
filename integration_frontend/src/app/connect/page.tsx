@@ -60,6 +60,8 @@ function ConnectInner() {
       const frontendBase =
         (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")).replace(/\/*$/, "");
       const callbackUrl = `${frontendBase}/oauth/${provider}`;
+      debugger;
+      console.log(callbackUrl)
 
       if (provider === "jira") {
         // Option A: request JSON { url } and redirect
