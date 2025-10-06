@@ -18,8 +18,16 @@ Environment variables:
 
 Initiating login from the UI:
 - Use the helper getAtlassianAuthUrl from `@/lib/oauth`:
-  const url = await getAtlassianAuthUrl({ returnUrl: `${window.location.origin}/oauth/jira`, state: "optional", scope: "optional" });
-  window.location.href = url;
+
+  // PUBLIC_INTERFACE example
+  import { getAtlassianAuthUrl } from "@/lib/oauth";
+
+  async function startLogin(provider = "jira") {
+    const base = (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || window.location.origin).replace(/\/*$/, "");
+    const returnUrl = `${base}/oauth/${provider}`;
+    const url = await getAtlassianAuthUrl({ returnUrl, state: "optional", scope: "optional" });
+    window.location.href = url;
+  }
 
 Legacy routes:
 - Frontend routes /auth/jira/login and /auth/confluence/login are thin proxies that 307-redirect to {BACKEND}/api/oauth/atlassian/login and preserve query params.
