@@ -12,7 +12,8 @@ import { getAtlassianAuthUrl } from "@/lib/oauth";
  * - GET {BACKEND}/api/oauth/atlassian/login
  *
  * Backend redirects the browser to Atlassian, and later to the configured backend callback
- * which will then redirect back to frontend pages like /oauth/jira or /oauth/confluence.
+ * at `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/atlassian/callback` which will then
+ * redirect back to frontend pages like /oauth/jira or /oauth/confluence.
  *
  * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */

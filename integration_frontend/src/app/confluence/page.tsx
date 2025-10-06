@@ -7,7 +7,7 @@ import EmptyState from "@/components/EmptyState";
 import FeedbackAlert from "@/components/FeedbackAlert";
 import Link from "next/link";
 
-export default function ConfluencePagesPage() {
+export default function ConfluencePages() {
   const [items, setItems] = useState<ConfluencePageRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
