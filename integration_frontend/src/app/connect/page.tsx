@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { buildOAuthLoginUrl } from "@/lib/oauth";
+import { buildOAuthLoginUrl, getJiraAuthUrl } from "@/lib/oauth";
 
 /**
  * ConnectPage
@@ -51,26 +51,41 @@ function ConnectInner() {
    * Start OAuth: redirect the browser to backend /auth/<provider>/login.
    * We include a return_url hint so backend can send user back to our callback page.
    */
-  function startOAuth(provider: "jira" | "confluence") {
-    setLoading(provider);
-    setError(null);
-    setSuccessMsg(null);
+  async function startOAuth(provider: "jira" | "confluence") {
+    try {
+      setLoading(provider);
+      setError(null);
+      setSuccessMsg(null);
 
-    const callbackUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/oauth/${provider}`
-        : `/oauth/${provider}`;
-        //debugger;
+      const callbackUrl =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/oauth/${provider}`
+          : `/oauth/${provider}`;
 
-    console.log("callbackurl", callbackUrl)
+      if (provider === "jira") {
+        // Option A: request JSON { url } and redirect
+        const url = await getJiraAuthUrl({ state: "kc-oauth", scope: "read" });
+        window.location.href = url;
+        return;
+      }
 
-    const url = buildOAuthLoginUrl({
-      provider,
-      returnUrl: callbackUrl,
-      state: "kc-oauth",
-      scope: "read",
-    });
-    window.location.href = url;
+      // Legacy path for Confluence (still using /auth/confluence/login)
+      const url = buildOAuthLoginUrl({
+        provider,
+        returnUrl: callbackUrl,
+        state: "kc-oauth",
+        scope: "read",
+      });
+      window.location.href = url;
+    } catch (e: unknown) {
+      console.error("Failed to start OAuth", e);
+      setLoading(null);
+      const msg =
+        typeof e === "object" && e !== null && "message" in e
+          ? String((e as { message?: string }).message || "")
+          : "";
+      setError(msg || "Failed to start OAuth. Please try again.");
+    }
   }
 
   return (
