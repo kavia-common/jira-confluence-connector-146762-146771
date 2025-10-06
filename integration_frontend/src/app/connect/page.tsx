@@ -57,8 +57,11 @@ function ConnectInner() {
     try {
       setLoading(provider);
       setError(null);
+      debugger;
+      console.log(authUrl)
       if (!authUrl) throw new Error("Authorization URL not ready");
       window.location.href = authUrl;
+      
     } catch (e) {
       setLoading(null);
       const message =
