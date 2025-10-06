@@ -2,7 +2,6 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import FeedbackAlert from "@/components/FeedbackAlert";
 import { getAtlassianAuthUrl } from "@/lib/oauth";
 
 /**
@@ -57,11 +56,8 @@ function ConnectInner() {
     try {
       setLoading(provider);
       setError(null);
-      debugger;
-      console.log(authUrl)
       if (!authUrl) throw new Error("Authorization URL not ready");
       window.location.href = authUrl;
-      
     } catch (e) {
       setLoading(null);
       const message =
@@ -93,14 +89,14 @@ function ConnectInner() {
       </div>
 
       {error && (
-        <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-red-800">
+          {error}
+        </div>
       )}
       {successMsg && (
-        <FeedbackAlert
-          type="success"
-          message={successMsg}
-          onClose={() => setSuccessMsg(null)}
-        />
+        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-green-800">
+          {successMsg}
+        </div>
       )}
 
       <div className="grid md:grid-cols-2 gap-6">
