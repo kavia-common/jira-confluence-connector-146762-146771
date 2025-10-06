@@ -3,17 +3,16 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { buildOAuthLoginUrl, getJiraAuthUrl } from "@/lib/oauth";
+import { getAtlassianAuthUrl } from "@/lib/oauth";
 
 /**
  * ConnectPage
  *
- * Starts OAuth by navigating to backend login endpoints:
- * - JIRA:        GET {BACKEND}/auth/jira/login
- * - Confluence:  GET {BACKEND}/auth/confluence/login
+ * Starts OAuth by navigating to backend PKCE endpoint:
+ * - GET {BACKEND}/api/oauth/atlassian/login
  *
- * Backend redirects the browser to Atlassian, and later to a frontend callback page:
- * - /oauth/jira and /oauth/confluence (UI callback pages)
+ * Backend redirects the browser to Atlassian, and later to the configured backend callback
+ * which will then redirect back to frontend pages like /oauth/jira or /oauth/confluence.
  *
  * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */
@@ -48,8 +47,8 @@ function ConnectInner() {
   }, []);
 
   /**
-   * Start OAuth: redirect the browser to backend /auth/<provider>/login.
-   * We include a return_url hint so backend can send user back to our callback page.
+   * Start OAuth: request the backend PKCE login URL and navigate there.
+   * We pass a return_url hint so backend can route back to a frontend page after it completes.
    */
   async function startOAuth(provider: "jira" | "confluence") {
     try {
@@ -58,25 +57,15 @@ function ConnectInner() {
       setSuccessMsg(null);
 
       const frontendBase =
-        (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")).replace(/\/*$/, "");
-      const callbackUrl = `${frontendBase}/oauth/${provider}`;
-      debugger;
-      console.log(callbackUrl)
+        (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL ||
+          (typeof window !== "undefined" ? window.location.origin : "")).replace(/\/*$/, "");
+      const returnUrl = `${frontendBase}/oauth/${provider}`;
 
-      if (provider === "jira") {
-        // Option A: request JSON { url } and redirect
-        const url = await getJiraAuthUrl({ state: "kc-oauth", scope: "read" });
-        window.location.href = url;
-        return;
-      }
-
-      // Legacy path for Confluence (still using /auth/confluence/login)
-      const url = buildOAuthLoginUrl({
-        provider,
-        returnUrl: callbackUrl,
+      const url = await getAtlassianAuthUrl({
+        returnUrl,
         state: "kc-oauth",
-        scope: "read",
       });
+
       window.location.href = url;
     } catch (e: unknown) {
       console.error("Failed to start OAuth", e);
