@@ -36,7 +36,7 @@ export default function Sidebar() {
         <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Links</div>
         <a
           className="text-sm text-primary hover:underline"
-          href="https://vscode-internal-14593-beta.beta01.cloud.kavia.ai:3001/docs"
+          href={`${process.env.NEXT_PUBLIC_BACKEND_URL || ""}/docs`}
           target="_blank"
           rel="noreferrer"
         >
