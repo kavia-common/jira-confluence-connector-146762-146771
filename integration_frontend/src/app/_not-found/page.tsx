@@ -5,18 +5,18 @@ import Link from 'next/link';
 
 /**
  * PUBLIC_INTERFACE
- * Framework-standard not-found page for the App Router.
- * Keeping it simple and client-only ensures compatibility with static HTML export.
+ * Custom Not Found page that is compatible with static export.
+ * This page is rendered for unknown routes and avoids importing any server-only modules.
  */
-export default function NotFound() {
+export default function NotFoundPage() {
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center text-center p-8">
-      <h1 className="text-2xl font-semibold mb-2">Not Found</h1>
+      <h1 className="text-2xl font-semibold mb-2">Page not found</h1>
       <p className="text-gray-600 mb-6">
-        We couldn&apos;t find what you were looking for.
+        The page you are looking for could not be found.
       </p>
       <Link href="/" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
-        Return Home
+        Go to Dashboard
       </Link>
     </main>
   );
