@@ -31,6 +31,17 @@ Port notes:
 - /confluence      Confluence pages (GET /integrations/confluence/pages/fetch)
 - /settings        App settings
 
+## Backend Connectivity Diagnostics
+
+- Visit /diagnostics in the running app to run a frontend-to-backend connectivity check.
+- It resolves the backend base URL from:
+  - NEXT_PUBLIC_BACKEND_URL (preferred)
+  - NEXT_PUBLIC_BACKEND_BASE_URL
+  - NEXT_PUBLIC_BACKEND_PUBLIC_BASE_URL
+  - Fallback to same-origin or http://localhost:3001
+- The page attempts GET `${BACKEND_URL}/health` and then `${BACKEND_URL}/` and shows status/payload snippets.
+- If a CORS issue is suspected, configure backend CORS to allow the frontend origin (e.g., NEXT_PUBLIC_FRONTEND_BASE_URL).
+
 ## Notes
 
 - This frontend expects the backend API described by the provided OpenAPI (FastAPI).

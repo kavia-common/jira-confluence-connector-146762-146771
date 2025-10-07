@@ -34,6 +34,7 @@ export default function Sidebar() {
           <NavItem href="/jira" label="JIRA Projects" />
           <NavItem href="/confluence" label="Confluence Pages" />
           <NavItem href="/connect" label="Connect Accounts" />
+          <NavItem href="/diagnostics" label="Diagnostics" />
         </div>
       </div>
       <div className="mt-6">
