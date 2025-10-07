@@ -77,6 +77,19 @@ export default function DiagnosticsPage() {
                   {typeof r.status !== 'undefined' && (
                     <div><span className="font-medium">HTTP Status:</span> {r.status}</div>
                   )}
+                  {r.responseUrl && (
+                    <div><span className="font-medium">Response URL:</span> {r.responseUrl}</div>
+                  )}
+                  {r.headers && (
+                    <div className="text-gray-700">
+                      <span className="font-medium">Response headers (selected):</span>
+                      <ul className="list-disc ml-6">
+                        {Object.entries(r.headers).map(([k, v]) => (
+                          <li key={k}><span className="font-medium">{k}:</span> {String(v)}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {r.payloadSnippet && (
                     <div className="text-gray-700">
                       <span className="font-medium">Payload snippet:</span>
