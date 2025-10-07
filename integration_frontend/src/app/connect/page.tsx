@@ -69,7 +69,8 @@ function ConnectInner() {
         setConn(c);
         // If already connected, show success
         if (c.connected) {
-          setSuccessMsg("Atlassian account already connected.");
+          const name = c?.account?.cloudName ? ` (${c.account.cloudName})` : "";
+          setSuccessMsg(`Atlassian account already connected${name}.`);
         }
       })
       .catch((e) => {
