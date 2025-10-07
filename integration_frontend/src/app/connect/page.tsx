@@ -3,16 +3,18 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getAtlassianAuthUrl } from "@/lib/oauth";
+import { checkConnectionStatus, type ConnectionStatus } from "@/lib/connectionStatus";
 
 /**
  * PUBLIC_INTERFACE
  * ConnectPage
  *
  * Connects JIRA/Confluence by starting the Atlassian OAuth flow and uses this page (/connect) as the return page.
- * - Builds an absolute returnUrl to this page (/connect) on the client.
- * - Uses getAtlassianAuthUrl({ returnUrl }) to retrieve the authorization URL from the backend.
- * - Redirects the browser to Atlassian on button click.
- * - Optionally displays status messages from query parameters (e.g., ?result=success|error&message=...).
+ * Improvements:
+ * - Checks backend connection status on mount and disables the Connect buttons if already connected.
+ * - Adds loading/disabled states while checks are in progress.
+ * - Surfaces errors instead of silently enabling the button.
+ * - Builds an absolute returnUrl to this page (/connect) on the client, and fetches the authorization URL.
  */
 export default function ConnectPage() {
   return (
@@ -28,28 +30,60 @@ function ConnectInner() {
   const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+
+  // readiness for starting OAuth
+  const [authReady, setAuthReady] = useState(false);
   const [authUrl, setAuthUrl] = useState<string>("");
 
-  // Prepare absolute return URL to this page (/connect) on the client only
+  // connection status
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [conn, setConn] = useState<ConnectionStatus | null>(null);
+
+  // Prepare absolute return URL and prefetch authorization URL
   useEffect(() => {
     const origin =
       typeof window !== "undefined"
         ? window.location.origin
-        : process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || "";
+        : (process.env.NEXT_PUBLIC_FRONTEND_BASE_URL as string | undefined) || "";
     if (!origin) return;
     const returnUrl = `${origin.replace(/\/*$/, "")}/connect`;
 
-    // Precompute the authorization URL so we can redirect quickly on click
     getAtlassianAuthUrl({ returnUrl })
       .then((url) => {
         setAuthUrl(url);
-        setReady(true);
+        setAuthReady(true);
       })
       .catch((e) => {
         console.error(e);
         setError(e?.message || "Failed to prepare authorization URL");
       });
+  }, []);
+
+  // Check connection status on mount
+  useEffect(() => {
+    let cancelled = false;
+    setStatusLoading(true);
+    checkConnectionStatus()
+      .then((c) => {
+        if (cancelled) return;
+        setConn(c);
+        // If already connected, show success
+        if (c.connected) {
+          setSuccessMsg("Atlassian account already connected.");
+        }
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        const message = e instanceof Error ? e.message : String(e);
+        setError(message);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setStatusLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleConnectClick = async (provider: "jira" | "confluence") => {
@@ -79,6 +113,10 @@ function ConnectInner() {
     }
   }, [result, message]);
 
+  const alreadyConnected = !!conn?.connected;
+  const buttonsDisabled =
+    statusLoading || !authReady || alreadyConnected || loading !== null;
+
   return (
     <div className="p-6 space-y-6 max-w-screen-lg mx-auto">
       <div>
@@ -96,6 +134,21 @@ function ConnectInner() {
       {successMsg && (
         <div className="rounded-md border border-green-200 bg-green-50 p-3 text-green-800">
           {successMsg}
+        </div>
+      )}
+      {statusLoading && (
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-blue-800">
+          Checking connection status…
+        </div>
+      )}
+      {!statusLoading && conn && conn.error && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-800">
+          Could not verify connection status. You can still attempt to connect. Details: {conn.details || conn.error}
+        </div>
+      )}
+      {!statusLoading && alreadyConnected && (
+        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-green-800">
+          Your Atlassian account appears connected{conn?.account?.cloudName ? ` (${conn.account.cloudName})` : ""}. Connect buttons are disabled.
         </div>
       )}
 
@@ -117,10 +170,16 @@ function ConnectInner() {
           <div className="mt-4">
             <button
               onClick={() => handleConnectClick("jira")}
-              disabled={!ready || loading === "jira"}
+              disabled={buttonsDisabled}
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
             >
-              {loading === "jira" ? "Redirecting..." : "Connect Now"}
+              {loading === "jira"
+                ? "Redirecting..."
+                : alreadyConnected
+                ? "Already Connected"
+                : authReady
+                ? "Connect Now"
+                : "Preparing..."}
             </button>
           </div>
 
@@ -146,10 +205,16 @@ function ConnectInner() {
           <div className="mt-4">
             <button
               onClick={() => handleConnectClick("confluence")}
-              disabled={!ready || loading === "confluence"}
+              disabled={buttonsDisabled}
               className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
             >
-              {loading === "confluence" ? "Redirecting..." : "Connect Now"}
+              {loading === "confluence"
+                ? "Redirecting..."
+                : alreadyConnected
+                ? "Already Connected"
+                : authReady
+                ? "Connect Now"
+                : "Preparing..."}
             </button>
           </div>
 
