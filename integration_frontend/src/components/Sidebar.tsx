@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getBackendPublicBaseUrl } from "@/lib/url";
 
 const NavItem = ({ href, label, icon }: { href: string; label: string; icon?: React.ReactNode }) => {
   const pathname = usePathname();
@@ -20,6 +21,9 @@ const NavItem = ({ href, label, icon }: { href: string; label: string; icon?: Re
 };
 
 export default function Sidebar() {
+  const backendBase = getBackendPublicBaseUrl();
+  const docsHref = backendBase ? `${backendBase}/docs` : "/api/docs";
+
   return (
     <aside className="sidebar">
       <div className="mb-4">
@@ -36,7 +40,7 @@ export default function Sidebar() {
         <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Links</div>
         <a
           className="text-sm text-primary hover:underline"
-          href={`${(process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/*$/, "")}/docs`}
+          href={docsHref}
           target="_blank"
           rel="noreferrer"
         >
