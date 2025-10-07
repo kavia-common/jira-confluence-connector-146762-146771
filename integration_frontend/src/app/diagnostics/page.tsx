@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { checkBackendConnectivity } from '@/lib/connectivity';
+import CorsLink from './_components/CorsLink';
 
 export default function DiagnosticsPage() {
   const [loading, setLoading] = React.useState(false);
@@ -33,6 +34,7 @@ export default function DiagnosticsPage() {
       <p className="text-sm text-gray-600">
         Uses NEXT_PUBLIC_BACKEND_URL through url.ts to contact the FastAPI backend. Tries /health then /.
       </p>
+      <CorsLink />
       <div className="flex items-center gap-2">
         <button
           onClick={run}
