@@ -9,8 +9,8 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 
 2. Configure environment
    - Create a .env.local file and set:
-     - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-28615-beta.beta01.cloud.kavia.ai:3001
-     - NEXT_PUBLIC_FRONTEND_BASE_URL=https://vscode-internal-28615-beta.beta01.cloud.kavia.ai:4000
+     - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-18211-beta.beta01.cloud.kavia.ai:3001
+     - NEXT_PUBLIC_FRONTEND_BASE_URL=https://vscode-internal-18211-beta.beta01.cloud.kavia.ai:4000
    - If omitted, the app will call the backend via same origin where applicable.
 
 3. Run
@@ -46,9 +46,9 @@ Port notes:
 
 - This frontend expects the backend API described by the provided OpenAPI (FastAPI).
 - Ensure NEXT_PUBLIC_BACKEND_URL is the backend origin only (no '/docs'). Example:
-  NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-28615-beta.beta01.cloud.kavia.ai:3001
+  NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-18211-beta.beta01.cloud.kavia.ai:3001
   The backend will compute redirect_uri:
-  https://vscode-internal-28615-beta.beta01.cloud.kavia.ai:3001/api/oauth/atlassian/callback
+  https://vscode-internal-18211-beta.beta01.cloud.kavia.ai:3001/api/oauth/atlassian/callback
 - Authorization bearer token is stored in localStorage (demo only).
 - Styling uses CSS variables and utility classes aligned with Ocean Professional theme.
 - Helpers:
