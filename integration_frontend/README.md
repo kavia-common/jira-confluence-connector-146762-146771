@@ -17,6 +17,11 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
    - npm run dev
    - open http://localhost:3000
 
+Port notes:
+- If port 3000 is already in use, Next.js will automatically choose the next available port (e.g., 3001 or 3002).
+- To force dev on port 3000 (and fail if unavailable), use: npm run dev:port
+- You can also set a custom port: PORT=4000 npm run dev
+
 ## Routes
 
 - /                Overview
