@@ -8,7 +8,7 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
    - npm install
 
 2. Configure environment
-   - Create a .env.local file and set:
+   - Copy .env.example to .env.local and adjust as needed:
      - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-14593-beta.beta01.cloud.kavia.ai:3001
    - If omitted, the app will call the backend via same origin.
 
