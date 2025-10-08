@@ -4,13 +4,14 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
 import { buildOAuthLoginUrl } from "@/lib/oauth";
+import ConnectJiraButton from "@/components/ConnectJiraButton";
 
 /**
  * ConnectPage
  *
  * Starts OAuth by navigating to backend login endpoints:
- * - JIRA:        GET {BACKEND}/auth/jira/login
- * - Confluence:  GET {BACKEND}/auth/confluence/login
+ * - JIRA:        GET {BACKEND}/auth/jira/login (fetch authorize URL -> redirect)
+ * - Confluence:  GET {BACKEND}/auth/confluence/login (direct navigate)
  *
  * Backend redirects the browser to Atlassian, and later to a frontend callback page:
  * - /oauth/jira and /oauth/confluence
@@ -28,7 +29,7 @@ export default function ConnectPage() {
 function ConnectInner() {
   const params = useSearchParams();
 
-  const [loading, setLoading] = useState<"jira" | "confluence" | null>(null);
+  const [loadingConfluence, setLoadingConfluence] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -47,20 +48,20 @@ function ConnectInner() {
   }, []);
 
   /**
-   * Start OAuth: redirect the browser to backend /auth/<provider>/login.
+   * Start OAuth for Confluence by navigating to backend /auth/confluence/login.
    * We include a return_url hint so backend can send user back to our callback page.
    */
-  function startOAuth(provider: "jira" | "confluence") {
-    setLoading(provider);
+  function startConfluenceOAuth() {
+    setLoadingConfluence(true);
     setError(null);
     setSuccessMsg(null);
 
     const callbackUrl =
       typeof window !== "undefined"
-        ? `${window.location.origin}/oauth/${provider}`
-        : `/oauth/${provider}`;
+        ? `${window.location.origin}/oauth/confluence`
+        : `/oauth/confluence`;
 
-    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    const url = buildOAuthLoginUrl("confluence", callbackUrl, "kc-oauth", "read");
     window.location.href = url;
   }
 
@@ -91,7 +92,7 @@ function ConnectInner() {
             <div>
               <h2 className="text-lg font-medium">JIRA</h2>
               <p className="text-sm text-gray-600">
-                Starts Atlassian OAuth via backend.
+                Starts Atlassian OAuth via backend. We will redirect you to Atlassian right away.
               </p>
             </div>
             <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
@@ -100,13 +101,14 @@ function ConnectInner() {
           </div>
 
           <div className="mt-4">
-            <button
-              onClick={() => startOAuth("jira")}
-              disabled={loading === "jira"}
+            <ConnectJiraButton
+              onError={(msg) => setError(msg)}
+              idleLabel="Connect Now"
+              loadingLabel="Redirecting..."
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
-            >
-              {loading === "jira" ? "Redirecting..." : "Connect Now"}
-            </button>
+              state="kc-oauth"
+              scope="read"
+            />
           </div>
 
           <div className="mt-3 text-sm text-gray-500">
@@ -130,11 +132,11 @@ function ConnectInner() {
 
           <div className="mt-4">
             <button
-              onClick={() => startOAuth("confluence")}
-              disabled={loading === "confluence"}
+              onClick={startConfluenceOAuth}
+              disabled={loadingConfluence}
               className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
             >
-              {loading === "confluence" ? "Redirecting..." : "Connect Now"}
+              {loadingConfluence ? "Redirecting..." : "Connect Now"}
             </button>
           </div>
 
