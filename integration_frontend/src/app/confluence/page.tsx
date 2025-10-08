@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchConfluencePages } from "@/lib/api";
-import { ConfluencePageRead } from "@/lib/types";
+import { fetchConfluencePages, type ConfluencePageRead } from "@/lib/api";
 import EmptyState from "@/components/EmptyState";
 import FeedbackAlert from "@/components/FeedbackAlert";
 import Link from "next/link";

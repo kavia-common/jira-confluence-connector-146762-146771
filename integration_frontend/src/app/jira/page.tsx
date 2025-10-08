@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchJiraProjects } from "@/lib/api";
-import { JiraProjectRead } from "@/lib/types";
+import { fetchJiraProjects, type JiraProjectRead } from "@/lib/api";
 import EmptyState from "@/components/EmptyState";
 import FeedbackAlert from "@/components/FeedbackAlert";
 import Link from "next/link";
