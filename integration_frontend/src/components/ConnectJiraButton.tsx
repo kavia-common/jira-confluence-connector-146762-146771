@@ -1,23 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { getJiraLoginUrl } from "@/lib/api";
 import { buildOAuthLoginUrl } from "@/lib/oauth";
 
 /**
  * PUBLIC_INTERFACE
  * ConnectJiraButton
- * A reusable button that starts the Jira OAuth flow by calling the backend
- * GET /auth/jira/login to obtain the Atlassian authorize URL and then redirects
- * the browser (window.location.href) to it.
+ * A reusable button that starts the Jira OAuth flow by navigating the browser
+ * directly to the backend login endpoint with ?redirect=true so the server issues
+ * a 307 redirect to Atlassian's authorize URL (auth.atlassian.com/authorize...).
+ *
+ * This component does not construct or rewrite any Atlassian URLs and relies solely
+ * on the backend to produce the correct authorize URL and redirect.
  *
  * Props:
  *  - onError?: (message: string) => void             // optional error callback
  *  - idleLabel?: string                              // button text when idle
  *  - loadingLabel?: string                           // button text while fetching/redirecting
  *  - className?: string                              // button CSS classes
- *  - state?: string                                  // optional OAuth state param
- *  - scope?: string                                  // optional scope string
+ *  - state?: string                                  // optional OAuth state param (preserved)
+ *  - scope?: string                                  // optional scope string (preserved)
  *  - returnUrl?: string                              // optional callback override; defaults to /oauth/jira
  */
 export default function ConnectJiraButton({
@@ -26,7 +28,9 @@ export default function ConnectJiraButton({
   loadingLabel = "Redirecting...",
   className,
   state = "kc-oauth",
-  scope = "read",
+  // Default Jira scopes ensure offline refresh and read access:
+  // offline_access read:jira-work read:jira-user
+  scope = "offline_access read:jira-work read:jira-user",
   returnUrl,
 }: {
   onError?: (message: string) => void;
@@ -39,7 +43,7 @@ export default function ConnectJiraButton({
 }) {
   const [loading, setLoading] = useState(false);
 
-  async function handleClick() {
+  function handleClick() {
     try {
       setLoading(true);
       const cb =
@@ -48,35 +52,19 @@ export default function ConnectJiraButton({
           ? `${window.location.origin}/oauth/jira`
           : "/oauth/jira");
 
-      const authorizeUrl = await getJiraLoginUrl({
-        state,
-        scope,
-        returnUrl: cb,
-      });
+      // Build backend login URL and let the backend issue the 307 redirect to Atlassian.
+      const direct = buildOAuthLoginUrl("jira", cb, state, scope);
+      const u = new URL(
+        direct,
+        typeof window !== "undefined" ? window.location.origin : "http://localhost"
+      );
+      // Ask the backend to perform a redirect (307) instead of returning JSON.
+      u.searchParams.set("redirect", "true");
 
-      // Immediately redirect to Atlassian's authorize page
-      window.location.assign(authorizeUrl);
+      // Immediately navigate; the backend will redirect to auth.atlassian.com/authorize...
+      window.location.assign(u.toString());
     } catch (err) {
-      console.error("Jira connect error:", err);
-      // Fallback: try direct navigation to backend to let browser follow 302 redirect.
-      try {
-        const cb2 =
-          returnUrl ||
-          (typeof window !== "undefined"
-            ? `${window.location.origin}/oauth/jira`
-            : "/oauth/jira");
-        const direct = buildOAuthLoginUrl("jira", cb2, state, scope);
-        const u = new URL(
-          direct,
-          typeof window !== "undefined" ? window.location.origin : "http://localhost"
-        );
-        // Hint backend to send a 302 redirect if supported
-        u.searchParams.set("redirect", "true");
-        window.location.assign(u.toString());
-        return;
-      } catch (navErr) {
-        console.error("Jira direct navigation fallback failed:", navErr);
-      }
+      console.error("Jira connect navigation error:", err);
       setLoading(false);
       const message =
         err instanceof Error ? err.message : "Failed to start Jira authorization.";

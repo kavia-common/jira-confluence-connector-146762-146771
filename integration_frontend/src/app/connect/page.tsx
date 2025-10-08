@@ -10,7 +10,7 @@ import ConnectJiraButton from "@/components/ConnectJiraButton";
  * ConnectPage
  *
  * Starts OAuth by navigating to backend login endpoints:
- * - JIRA:        GET {BACKEND}/auth/jira/login (fetch authorize URL -> redirect)
+ * - JIRA:        GET {BACKEND}/auth/jira/login?redirect=true (server 307 -> auth.atlassian.com/authorize)
  * - Confluence:  GET {BACKEND}/auth/confluence/login (direct navigate)
  *
  * Backend redirects the browser to Atlassian, and later to a frontend callback page:
@@ -107,7 +107,8 @@ function ConnectInner() {
               loadingLabel="Redirecting..."
               className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
               state="kc-oauth"
-              scope="read"
+              // Note: scope omitted to use component's default:
+              // "offline_access read:jira-work read:jira-user"
             />
           </div>
 
