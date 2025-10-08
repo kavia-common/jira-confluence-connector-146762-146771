@@ -37,7 +37,10 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 ## Module path alias
 
 - The `@` alias is configured to point to `src/` via `tsconfig.json` (`"paths": { "@/*": ["./src/*"] }`).
-- Shared helpers for backend calls are exposed under `@/lib/api` (buildBackendUrl, getApiBaseUrl) and `@/lib/oauth`.
+- Shared helpers for backend calls are exposed under:
+  - `@/lib/api` (buildBackendUrl, getApiBaseUrl, fetchJiraProjects, fetchConfluencePages)
+  - `@/lib/oauth` (buildOAuthLoginUrl)
+  - `@/lib/connectorsClient` (searchConnector, quickCreateConnector)
 
 ## Environment
 
