@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@/styles/connector.css";
 import Topbar from "@/components/Topbar";
 import Sidebar from "@/components/Sidebar";
 
