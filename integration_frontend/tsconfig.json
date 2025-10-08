@@ -1,4 +1,5 @@
 {
+  // Next.js TypeScript config with '@' alias pointing to ./src
   "compilerOptions": {
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
