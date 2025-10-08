@@ -13,7 +13,7 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
    - If omitted, the app will call the backend via same origin.
    - Note: This value is read at build-time by Next.js for client-side usage. If you change it, rebuild the app.
    - OAuth note: The backend controls the Atlassian redirect_uri via ATLASSIAN_OAUTH_REDIRECT_URI; the frontend should not pass redirect_uri. Ensure Atlassian app uses:
-     https://vscode-internal-21156-beta.beta01.cloud.kavia.ai:3001/api/oauth/atlassian/callback
+     https://vscode-internal-36721-beta.beta01.cloud.kavia.ai:3001/auth/jira/callback
 
 3. Run
    - npm run dev
