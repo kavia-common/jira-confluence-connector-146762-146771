@@ -11,10 +11,28 @@
  *
  * This prevents 404s if the backend redirects to /oauth/callback as documented.
  */
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+/**
+ * Wrap inner component that calls useSearchParams in a Suspense boundary per Next.js requirement.
+ */
 export default function OAuthCallbackRouter() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 max-w-screen-md mx-auto">
+          <h1 className="text-2xl font-semibold mb-3">Finalizing authorization...</h1>
+          <p className="text-sm text-gray-700">Redirecting you to the appropriate page.</p>
+        </div>
+      }
+    >
+      <OAuthCallbackRouterInner />
+    </Suspense>
+  );
+}
+
+function OAuthCallbackRouterInner() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -35,13 +53,14 @@ export default function OAuthCallbackRouter() {
     } else {
       // Fallback: go to /connect and surface error if unknown provider
       if (message) {
-        router.replace(`/connect?status=${encodeURIComponent(status)}&message=${encodeURIComponent(message)}`);
+        router.replace(
+          `/connect?status=${encodeURIComponent(status)}&message=${encodeURIComponent(message)}`
+        );
       } else {
         router.replace("/connect");
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params, router]);
 
   return (
     <div className="p-6 max-w-screen-md mx-auto">

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { buildBackendUrl } from "@/lib/api";
 
 const NavItem = ({ href, label, icon }: { href: string; label: string; icon?: React.ReactNode }) => {
   const pathname = usePathname();
@@ -36,7 +37,7 @@ export default function Sidebar() {
         <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Links</div>
         <a
           className="text-sm text-primary hover:underline"
-          href="https://vscode-internal-14593-beta.beta01.cloud.kavia.ai:3001/docs"
+          href={buildBackendUrl("/docs")}
           target="_blank"
           rel="noreferrer"
         >
