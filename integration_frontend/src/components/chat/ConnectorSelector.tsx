@@ -11,8 +11,9 @@ import ConnectorSuggestionItem from "./ConnectorSuggestionItem";
 /**
  * A lightweight overlay selector anchored to the caret inside a textarea.
  * - Debounced search
- * - Keyboard navigation (↑/↓/Enter/Escape)
+ * - Keyboard navigation (↑/↓/Enter/Tab/Escape)
  * - Emits a standardized StructuredReference on selection
+ * - Accessible with ARIA attributes and live status updates
  */
 
 function useDebounced<T>(value: T, delay = 250): T {
@@ -96,6 +97,8 @@ export default function ConnectorSelector({
   queryText,
   onSelect,
   onClose,
+  listboxId,
+  onActiveDescendantChange,
 }: {
   // Accept both RefObject and MutableRefObject by using a minimal structural type.
   textareaRef: { current: HTMLTextAreaElement | null };
@@ -103,6 +106,10 @@ export default function ConnectorSelector({
   queryText: string;
   onSelect: (ref: StructuredReference, picked: ConnectorSearchItem) => void;
   onClose: () => void;
+  /** DOM id used by the listbox for aria-controls from the textarea */
+  listboxId: string;
+  /** Callback to update aria-activedescendant on the textarea */
+  onActiveDescendantChange?: (id: string | null) => void;
 }) {
   const debouncedQuery = useDebounced(queryText, 250);
   const [items, setItems] = useState<ConnectorSearchItem[]>([]);
@@ -111,6 +118,7 @@ export default function ConnectorSelector({
   const [activeIndex, setActiveIndex] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   // Compute anchor position next to caret
   useEffect(() => {
@@ -146,7 +154,21 @@ export default function ConnectorSelector({
     return () => ctrl.abort();
   }, [connector, debouncedQuery]);
 
-  // Keyboard navigation
+  // Outside click closes the selector
+  useEffect(() => {
+    function onDocMouseDown(ev: MouseEvent) {
+      const target = ev.target as Node | null;
+      const withinOverlay = overlayRef.current?.contains(target as Node) ?? false;
+      const withinTextarea = textareaRef.current?.contains(target as Node) ?? false;
+      if (!withinOverlay && !withinTextarea) {
+        onClose();
+      }
+    }
+    document.addEventListener("mousedown", onDocMouseDown, { capture: true });
+    return () => document.removeEventListener("mousedown", onDocMouseDown, { capture: true });
+  }, [onClose, textareaRef]);
+
+  // Keyboard navigation and commit
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -164,7 +186,7 @@ export default function ConnectorSelector({
         setActiveIndex((i) => (items.length ? Math.max(i - 1, 0) : 0));
         return;
       }
-      if (e.key === "Enter") {
+      if (e.key === "Enter" || e.key === "Tab") {
         if (!items.length) return;
         e.preventDefault();
         const picked = items[Math.max(0, Math.min(activeIndex, items.length - 1))];
@@ -187,6 +209,16 @@ export default function ConnectorSelector({
     return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, [items, activeIndex, connector, onSelect, onClose]);
 
+  // Keep aria-activedescendant synced
+  useEffect(() => {
+    if (!items.length) {
+      onActiveDescendantChange?.(null);
+      return;
+    }
+    const id = `${listboxId}-option-${Math.max(0, Math.min(activeIndex, items.length - 1))}`;
+    onActiveDescendantChange?.(id);
+  }, [activeIndex, items.length, listboxId, onActiveDescendantChange]);
+
   const style = useMemo<React.CSSProperties>(() => {
     if (!position) return { display: "none" };
     // Keep within viewport bounds
@@ -199,25 +231,41 @@ export default function ConnectorSelector({
   }, [position]);
 
   return (
-    <div className="connector-overlay" style={style} role="listbox" aria-label={`${connector.displayName} results`}>
+    <div
+      ref={overlayRef}
+      className="connector-overlay"
+      style={style}
+      role="listbox"
+      id={listboxId}
+      aria-label={`${connector.displayName} results`}
+      aria-busy={loading ? "true" : "false"}
+    >
       <div className="connector-header">
         <div className="connector-title">{connector.displayName} • Suggestions</div>
-        <div className="connector-help">↑/↓ to navigate • Enter select • Esc close</div>
+        <div className="connector-help">↑/↓ to navigate • Enter/Tab select • Esc close</div>
       </div>
 
       {loading ? (
-        <div className="connector-empty">Searching…</div>
+        <div className="connector-empty" role="status" aria-live="polite">
+          <span className="connector-spinner" aria-hidden="true" /> Searching…
+        </div>
       ) : error ? (
-        <div className="connector-error">{error}</div>
+        <div className="connector-error" role="alert" aria-live="assertive">
+          {error}
+        </div>
       ) : !items.length ? (
-        <div className="connector-empty">No results for “{debouncedQuery || "…" }”.</div>
+        <div className="connector-empty" role="status" aria-live="polite">
+          No results for “{debouncedQuery || "…"}”.
+        </div>
       ) : (
         <div className="connector-list">
           {items.map((item, idx) => (
             <ConnectorSuggestionItem
               key={`${item.id}-${idx}`}
+              idAttr={`${listboxId}-option-${idx}`}
               item={item}
               isActive={idx === activeIndex}
+              onMouseEnter={() => setActiveIndex(idx)}
               onClick={() =>
                 onSelect(
                   {
