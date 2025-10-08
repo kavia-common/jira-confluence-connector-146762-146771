@@ -62,7 +62,7 @@ function ConnectInner() {
         : `/oauth/confluence`;
 
     const url = buildOAuthLoginUrl("confluence", callbackUrl, "kc-oauth", "read");
-    window.location.href = url;
+    window.location.assign(url);
   }
 
   return (

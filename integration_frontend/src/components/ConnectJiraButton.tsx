@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { getJiraLoginUrl } from "@/lib/api";
+import { buildOAuthLoginUrl } from "@/lib/oauth";
 
 /**
  * PUBLIC_INTERFACE
@@ -54,9 +55,28 @@ export default function ConnectJiraButton({
       });
 
       // Immediately redirect to Atlassian's authorize page
-      window.location.href = authorizeUrl;
+      window.location.assign(authorizeUrl);
     } catch (err) {
       console.error("Jira connect error:", err);
+      // Fallback: try direct navigation to backend to let browser follow 302 redirect.
+      try {
+        const cb2 =
+          returnUrl ||
+          (typeof window !== "undefined"
+            ? `${window.location.origin}/oauth/jira`
+            : "/oauth/jira");
+        const direct = buildOAuthLoginUrl("jira", cb2, state, scope);
+        const u = new URL(
+          direct,
+          typeof window !== "undefined" ? window.location.origin : "http://localhost"
+        );
+        // Hint backend to send a 302 redirect if supported
+        u.searchParams.set("redirect", "true");
+        window.location.assign(u.toString());
+        return;
+      } catch (navErr) {
+        console.error("Jira direct navigation fallback failed:", navErr);
+      }
       setLoading(false);
       const message =
         err instanceof Error ? err.message : "Failed to start Jira authorization.";
