@@ -1,10 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { getApiBaseUrl } from "@/lib/api";
 
 export default function SettingsPage() {
   const baseUrl = getApiBaseUrl();
+
+  // Lightweight diagnostic: log resolved backend base URL at runtime.
+  useEffect(() => {
+    try {
+      // This helps detect build-time env embedding issues and stale values.
+      // It is safe and only logs to the browser console.
+      console.log("[Settings] getApiBaseUrl() resolved to:", baseUrl || "(same origin)");
+
+      // Log the build-time embedded env value in a type-safe way without TS directives.
+      const buildTimeEnv =
+        typeof process !== "undefined" && (process as unknown as { env?: Record<string, string | undefined> }).env
+          ? (process as unknown as { env: Record<string, string | undefined> }).env["NEXT_PUBLIC_BACKEND_URL"]
+          : undefined;
+      console.log("[Settings] NEXT_PUBLIC_BACKEND_URL (build-time):", buildTimeEnv);
+    } catch {
+      // ignore
+    }
+  }, [baseUrl]);
 
   return (
     <div className="max-w-screen-md mx-auto">
@@ -18,6 +36,10 @@ export default function SettingsPage() {
           <div>
             <div className="text-sm font-medium mb-1">Backend API Base URL</div>
             <div className="text-sm text-gray-700 break-all">{baseUrl || "(same origin)"}</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Tip: Check the browser console for the resolved backend URL. Rebuild the app after changing
+              NEXT_PUBLIC_BACKEND_URL.
+            </div>
           </div>
         </div>
       </div>
