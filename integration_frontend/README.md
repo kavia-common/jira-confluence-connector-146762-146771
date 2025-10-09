@@ -39,6 +39,7 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
   - Otherwise the app builds https://<current-host>:3001 for API calls (so frontend at :3000 talks to backend at :3001).
 - OAuth flow:
   - Frontend calls backend /auth/{jira|confluence}/login with redirect=false to get JSON { url } and then navigates to that Atlassian URL.
+  - The returned Atlassian URL already includes a server-generated state. Do not pass or override `state` from the frontend.
   - Backend uses redirect_uri on :3001 while return_url points back to the frontend (:3000) for post-callback routing.
 
 ## Module path alias
