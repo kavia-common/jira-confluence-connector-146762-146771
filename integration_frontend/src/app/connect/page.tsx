@@ -41,7 +41,7 @@ function ConnectInner() {
   }, []);
 
   return (
-    <div className="px-6 md:px-10 lg:px-16 py-6 space-y-6 max-w-6xl mx-auto">
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 space-y-6 max-w-6xl mx-auto">
       <header>
         <h1 className="text-2xl font-semibold text-gray-900">Connect Integrations</h1>
         <p className="text-sm text-gray-600 mt-1">
@@ -60,8 +60,8 @@ function ConnectInner() {
         />
       )}
 
-      {/* Added mt-8 mb-10 wrapper around connection cards for generous vertical spacing */}
-      <div className="mt-8 mb-10">
+      {/* Generous vertical spacing around connection cards: mt-12 mb-14 */}
+      <section className="mt-12 mb-14 space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           {/* JIRA Card */}
           <article className="card p-6 hover:shadow-lg transition-all duration-200">
@@ -113,7 +113,7 @@ function ConnectInner() {
             />
           </article>
         </div>
-      </div>
+      </section>
 
       <div className="text-center">
         <p className="text-xs text-gray-500">

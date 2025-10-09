@@ -12,8 +12,8 @@ import type { StructuredReference } from "@/connectors/types";
 export default function Home() {
   const [picked, setPicked] = useState<StructuredReference[]>([]);
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 md:px-10 lg:px-16">
-      {/* Hero/Welcome Section - More Attractive */}
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-2xl mx-auto">
+      {/* Hero/Welcome Section */}
       <section className="mb-8 card p-6 gradient-surface">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Jira-Confluence Integration</h1>
         <p className="text-sm text-gray-600">
@@ -21,7 +21,7 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Quick Access Cards - Improved Styling */}
+      {/* Quick Access Cards */}
       <section className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="card p-6 hover:shadow-lg transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">
@@ -63,7 +63,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Chat Playground - Removed description under heading per requirements */}
+      {/* Chat Playground */}
       <div className="card p-6 mb-8 hover:shadow-md transition-shadow duration-200">
         <h3 className="text-base font-semibold mb-4">Chat Playground</h3>
         <ChatInput

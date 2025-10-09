@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 /**
  * PUBLIC_INTERFACE
- * NavItem - Individual navigation link with active state
+ * NavItem - Individual navigation link with active state and enhanced spacing
  */
 const NavItem = ({ href, label }: { href: string; label: string }) => {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ const NavItem = ({ href, label }: { href: string; label: string }) => {
   return (
     <Link
       href={href}
-      className={`transition-base flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ${
+      className={`transition-base flex items-center gap-2 px-3 py-3.5 rounded-lg text-sm font-medium ${
         isActive
           ? "bg-white text-primary shadow-sm"
           : "text-gray-700 hover:bg-white/60 hover:text-gray-900"
@@ -28,12 +28,12 @@ const NavItem = ({ href, label }: { href: string; label: string }) => {
 
 /**
  * PUBLIC_INTERFACE
- * Sidebar - Main navigation sidebar
+ * Sidebar - Main navigation sidebar with enhanced spacing
  */
 export default function Sidebar() {
   return (
     <aside className="sidebar overflow-y-auto">
-      <nav className="space-y-1">
+      <nav className="mt-4 space-y-1">
         <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-3">
           Navigation
         </div>

@@ -25,7 +25,7 @@ export default function SettingsPage() {
   }, [baseUrl]);
 
   return (
-    <div className="max-w-screen-md mx-auto">
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-md mx-auto">
       <div className="card p-5">
         <h2 className="text-lg font-semibold mb-2">Settings</h2>
         <div className="space-y-3">

@@ -26,7 +26,7 @@ export default function ConfluencePagesPage() {
   }, []);
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 md:px-10 lg:px-16">
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Confluence Pages</h2>
         <Link href="/connect" className="btn btn-outline focus-ring">Manage Connections</Link>
