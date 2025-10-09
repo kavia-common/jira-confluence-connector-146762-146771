@@ -45,8 +45,8 @@ function ConfluenceOAuthCallbackInner() {
   }, []);
 
   return (
-    <div className="p-6 max-w-screen-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-3">Confluence Authorization</h1>
+    <div className="max-w-screen-md mx-auto">
+      <h1 className="text-2xl font-semibold mb-2">Confluence Authorization</h1>
       {status === "error" ? (
         <FeedbackAlert type="error" message={message} />
       ) : (
@@ -70,9 +70,7 @@ function ConfluenceOAuthCallbackInner() {
           <button
             className="btn btn-outline focus-ring"
             onClick={() =>
-              router.replace(
-                "/connect?status=success&provider=confluence"
-              )
+              router.replace("/connect?status=success&provider=confluence")
             }
           >
             Back to Connect

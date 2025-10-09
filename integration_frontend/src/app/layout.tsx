@@ -15,11 +15,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body className="bg-ocean-bg text-ocean-text" suppressHydrationWarning>
         <Topbar />
         <div className="layout">
           <Sidebar />
-          <main className="overflow-y-auto">{children}</main>
+          <main className="overflow-y-auto">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+              {children}
+            </div>
+          </main>
         </div>
       </body>
     </html>

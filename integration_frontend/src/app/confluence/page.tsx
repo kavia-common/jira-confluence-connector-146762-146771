@@ -26,17 +26,13 @@ export default function ConfluencePagesPage() {
   }, []);
 
   return (
-    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Confluence Pages</h2>
         <Link href="/connect" className="btn btn-outline focus-ring">Manage Connections</Link>
       </div>
 
-      {error && (
-        <div className="mb-4">
-          <FeedbackAlert type="error" message={error} />
-        </div>
-      )}
+      {error && <FeedbackAlert type="error" message={error} />}
 
       {loading ? (
         <div className="card p-6">

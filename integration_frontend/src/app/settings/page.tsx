@@ -6,14 +6,9 @@ import { getApiBaseUrl } from "@/lib/api";
 export default function SettingsPage() {
   const baseUrl = getApiBaseUrl();
 
-  // Lightweight diagnostic: log resolved backend base URL at runtime.
   useEffect(() => {
     try {
-      // This helps detect build-time env embedding issues and stale values.
-      // It is safe and only logs to the browser console.
       console.log("[Settings] getApiBaseUrl() resolved to:", baseUrl || "(same origin)");
-
-      // Log the build-time embedded env value in a type-safe way without TS directives.
       const buildTimeEnv =
         typeof process !== "undefined" && (process as unknown as { env?: Record<string, string | undefined> }).env
           ? (process as unknown as { env: Record<string, string | undefined> }).env["NEXT_PUBLIC_BACKEND_URL"]
@@ -25,10 +20,10 @@ export default function SettingsPage() {
   }, [baseUrl]);
 
   return (
-    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-md mx-auto">
-      <div className="card p-5">
+    <div className="max-w-screen-md mx-auto">
+      <div className="card p-6">
         <h2 className="text-lg font-semibold mb-2">Settings</h2>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
             <div className="text-sm font-medium mb-1">Access</div>
             <div className="text-sm text-gray-700">Public access enabled. No login required.</div>

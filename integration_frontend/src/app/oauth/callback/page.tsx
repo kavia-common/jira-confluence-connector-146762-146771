@@ -21,8 +21,8 @@ export default function OAuthCallbackRouter() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 max-w-screen-md mx-auto">
-          <h1 className="text-2xl font-semibold mb-3">Finalizing authorization...</h1>
+        <div className="max-w-screen-md mx-auto">
+          <h1 className="text-2xl font-semibold mb-2">Finalizing authorization...</h1>
           <p className="text-sm text-gray-700">Redirecting you to the appropriate page.</p>
         </div>
       }
@@ -52,7 +52,6 @@ function OAuthCallbackRouterInner() {
     } else if (provider === "confluence") {
       router.replace(`/oauth/confluence?${qs.toString()}`);
     } else {
-      // Fallback: go to /connect and surface error if unknown provider
       if (message) {
         router.replace(
           `/connect?status=${encodeURIComponent(status)}&message=${encodeURIComponent(message)}`
@@ -64,8 +63,8 @@ function OAuthCallbackRouterInner() {
   }, [params, router]);
 
   return (
-    <div className="p-6 max-w-screen-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-3">Finalizing authorization...</h1>
+    <div className="max-w-screen-md mx-auto">
+      <h1 className="text-2xl font-semibold mb-2">Finalizing authorization...</h1>
       <p className="text-sm text-gray-700">Redirecting you to the appropriate page.</p>
     </div>
   );

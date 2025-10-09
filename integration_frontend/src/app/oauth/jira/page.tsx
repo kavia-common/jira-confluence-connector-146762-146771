@@ -46,8 +46,8 @@ function JiraOAuthCallbackInner() {
   }, []);
 
   return (
-    <div className="p-6 max-w-screen-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-3">JIRA Authorization</h1>
+    <div className="max-w-screen-md mx-auto">
+      <h1 className="text-2xl font-semibold mb-2">JIRA Authorization</h1>
       {status === "error" ? (
         <FeedbackAlert type="error" message={message} />
       ) : (

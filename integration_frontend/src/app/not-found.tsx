@@ -9,7 +9,7 @@ export default function NotFound() {
           <h1 className="text-xl font-semibold">404 – Page Not Found</h1>
           <p className="text-sm text-gray-600">The page you’re looking for doesn’t exist.</p>
         </header>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Link href="/" className="btn btn-primary focus-ring inline-block">Return home</Link>
           <Link href="/connect" className="btn btn-outline focus-ring inline-block">Go to Connect</Link>
           <Link href="/jira" className="btn btn-outline focus-ring inline-block">JIRA Projects</Link>
