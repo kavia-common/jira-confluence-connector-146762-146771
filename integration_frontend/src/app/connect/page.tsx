@@ -81,7 +81,7 @@ function ConnectInner() {
               </span>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-10 md:mt-12">
               <ConnectJiraButton
                 onError={(msg) => setError(msg)}
                 idleLabel="Connect JIRA"
