@@ -81,12 +81,14 @@ function ConnectInner() {
               </span>
             </div>
 
-            <ConnectJiraButton
-              onError={(msg) => setError(msg)}
-              idleLabel="Connect JIRA"
-              loadingLabel="Connecting..."
-              className="w-full btn btn-primary focus-ring"
-            />
+            <div className="mt-8">
+              <ConnectJiraButton
+                onError={(msg) => setError(msg)}
+                idleLabel="Connect JIRA"
+                loadingLabel="Connecting..."
+                className="w-full btn btn-primary focus-ring"
+              />
+            </div>
           </article>
 
           {/* Confluence Card */}
@@ -106,12 +108,14 @@ function ConnectInner() {
               </span>
             </div>
 
-            <ConnectConfluenceButton
-              onError={(msg) => setError(msg)}
-              idleLabel="Connect Confluence"
-              loadingLabel="Connecting..."
-              className="w-full btn btn-amber focus-ring"
-            />
+            <div className="mt-8">
+              <ConnectConfluenceButton
+                onError={(msg) => setError(msg)}
+                idleLabel="Connect Confluence"
+                loadingLabel="Connecting..."
+                className="w-full btn btn-amber focus-ring"
+              />
+            </div>
           </article>
         </div>
       </section>
