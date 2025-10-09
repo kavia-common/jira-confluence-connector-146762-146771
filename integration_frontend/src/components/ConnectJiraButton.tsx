@@ -51,6 +51,8 @@ export default function ConnectJiraButton({
         (typeof window !== "undefined" ? `${window.location.origin}/oauth/jira` : "/oauth/jira");
 
       // Fetch Atlassian authorize URL from backend (redirect=false) and navigate to it.
+      // Note: fetchOAuthAuthorizeUrl uses mode:'cors' and credentials:'omit' to avoid cross-site cookies.
+      // Backend CORS is configured to allow the :3000 origin and GET method only.
       const authorizeUrl = await fetchOAuthAuthorizeUrl("jira", {
         returnUrl: cb,
         state,
