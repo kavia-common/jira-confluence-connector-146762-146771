@@ -14,7 +14,7 @@ const NavItem = ({ href, label }: { href: string; label: string }) => {
   return (
     <Link
       href={href}
-      className={`transition-base flex items-center gap-2 px-3 py-3.5 rounded-lg text-sm font-medium ${
+      className={`transition-base flex items-center gap-4 px-3 py-4 rounded-lg text-sm font-medium ${
         isActive
           ? "bg-white text-primary shadow-sm"
           : "text-gray-700 hover:bg-white/60 hover:text-gray-900"
@@ -33,8 +33,8 @@ const NavItem = ({ href, label }: { href: string; label: string }) => {
 export default function Sidebar() {
   return (
     <aside className="sidebar overflow-y-auto">
-      <nav className="mt-4 space-y-1">
-        <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-3">
+      <nav className="pt-6 pb-8 space-y-2">
+        <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4 px-3">
           Navigation
         </div>
         <NavItem href="/" label="Overview" />
