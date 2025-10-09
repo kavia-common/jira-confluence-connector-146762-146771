@@ -9,12 +9,12 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 
 2. Configure environment
    - Copy .env.example to .env.local and adjust as needed:
-     - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-29161-beta.beta01.cloud.kavia.ai:3001
+     - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-36200-beta.beta01.cloud.kavia.ai:3001
    - If omitted, the app will call the backend via same origin.
    - Note: This value is read at build-time by Next.js for client-side usage. If you change it, rebuild the app.
    - OAuth note: The backend controls the Atlassian redirect_uri via JIRA_REDIRECT_URI (backend env). The frontend should not pass redirect_uri.
      Ensure Atlassian app Redirect URL uses exactly:
-     https://vscode-internal-29161-beta.beta01.cloud.kavia.ai:3001/auth/jira/callback
+     https://vscode-internal-36200-beta.beta01.cloud.kavia.ai:3001/auth/jira/callback
 
 3. Run
    - npm run dev
@@ -38,6 +38,7 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 ## Module path alias
 
 - The `@` alias is configured to point to `src/` via `tsconfig.json` (`"paths": { "@/*": ["./src/*"] }`).
+- If you see "Module not found: Can't resolve '@/...'", ensure you are importing from `@/` and that the file exists under `src/`.
 - Shared helpers for backend calls are exposed under:
   - `@/lib/api` (buildBackendUrl, getApiBaseUrl, fetchJiraProjects, fetchConfluencePages)
   - `@/lib/oauth` (buildOAuthLoginUrl)
