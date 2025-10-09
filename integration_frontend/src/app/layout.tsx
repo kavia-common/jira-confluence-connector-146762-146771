@@ -11,23 +11,15 @@ export const metadata: Metadata = {
 
 /**
  * RootLayout renders the public app shell without any authentication wrappers.
- * Applies Ocean Professional global background gradient and container spacing.
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className="min-h-screen bg-gradient-to-b from-blue-500/10 via-gray-50 to-white"
-      >
+      <body suppressHydrationWarning>
         <Topbar />
         <div className="layout">
           <Sidebar />
-          <main className="w-full overflow-y-auto">
-            <div className="max-w-7xl mx-auto pt-12 pb-16 px-6 md:px-10 lg:px-16 space-y-12 md:space-y-16">
-              {children}
-            </div>
-          </main>
+          <main className="p-4 overflow-y-auto">{children}</main>
         </div>
       </body>
     </html>

@@ -41,31 +41,37 @@ function ConnectInner() {
   }, []);
 
   return (
-    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 space-y-6 max-w-7xl mx-auto">
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 space-y-6 max-w-6xl mx-auto">
       <header>
-        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">Connect Integrations</h1>
-        <p className="text-sm md:text-base text-gray-600 mt-1 leading-7">
-          Link your Atlassian accounts to access Jira and Confluence data.
+        <h1 className="text-2xl font-semibold text-gray-900">Connect Integrations</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Link your Atlassian accounts to access JIRA and Confluence data.
         </p>
       </header>
 
-      {error && <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />}
+      {error && (
+        <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />
+      )}
       {successMsg && (
-        <FeedbackAlert type="success" message={successMsg} onClose={() => setSuccessMsg(null)} />
+        <FeedbackAlert
+          type="success"
+          message={successMsg}
+          onClose={() => setSuccessMsg(null)}
+        />
       )}
 
-      {/* Generous spacing and larger grid gaps */}
-      <section className="mt-20 mb-24">
-        <div className="grid md:grid-cols-2 gap-8 md:gap-10">
+      {/* Enhanced vertical spacing around connection cards: mt-20 mb-24 with increased gaps */}
+      <section className="mt-20 mb-24 space-y-6">
+        <div className="grid md:grid-cols-2 gap-y-10 gap-x-6 md:gap-10">
           {/* JIRA Card */}
-          <article className="rounded-xl bg-white border border-gray-100 shadow-sm p-6 md:p-8 hover:shadow-md transition-shadow">
+          <article className="card p-6 hover:shadow-lg transition-all duration-200">
             <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
                   <span className="text-blue-600 font-bold text-xl">J</span>
                 </div>
                 <div>
-                  <h2 className="text-xl md:text-2xl font-medium text-gray-900">Jira</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">JIRA</h2>
                   <p className="text-xs text-gray-500">Project Management</p>
                 </div>
               </div>
@@ -76,21 +82,21 @@ function ConnectInner() {
 
             <ConnectJiraButton
               onError={(msg) => setError(msg)}
-              idleLabel="Connect Jira"
+              idleLabel="Connect JIRA"
               loadingLabel="Connecting..."
-              className="w-full inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#2563EB] text-white hover:bg-blue-600 active:bg-blue-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1"
+              className="w-full btn btn-primary focus-ring"
             />
           </article>
 
           {/* Confluence Card */}
-          <article className="rounded-xl bg-white border border-gray-100 shadow-sm p-6 md:p-8 hover:shadow-md transition-shadow">
+          <article className="card p-6 hover:shadow-lg transition-all duration-200">
             <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center">
                   <span className="text-amber-600 font-bold text-xl">C</span>
                 </div>
                 <div>
-                  <h2 className="text-xl md:text-2xl font-medium text-gray-900">Confluence</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Confluence</h2>
                   <p className="text-xs text-gray-500">Knowledge Base</p>
                 </div>
               </div>
@@ -103,7 +109,7 @@ function ConnectInner() {
               onError={(msg) => setError(msg)}
               idleLabel="Connect Confluence"
               loadingLabel="Connecting..."
-              className="w-full inline-flex items-center justify-center h-11 px-6 rounded-lg bg-white border border-gray-200 text-gray-800 hover:border-gray-300 hover:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1"
+              className="w-full btn btn-amber focus-ring"
             />
           </article>
         </div>

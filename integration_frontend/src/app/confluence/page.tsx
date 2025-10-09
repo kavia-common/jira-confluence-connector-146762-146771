@@ -26,15 +26,10 @@ export default function ConfluencePagesPage() {
   }, []);
 
   return (
-    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-7xl mx-auto">
+    <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 max-w-screen-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl md:text-3xl font-semibold">Confluence Pages</h2>
-        <Link
-          href="/connect"
-          className="h-11 px-6 rounded-lg bg-white border border-gray-200 text-gray-800 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1"
-        >
-          Manage Connections
-        </Link>
+        <h2 className="text-xl font-semibold">Confluence Pages</h2>
+        <Link href="/connect" className="btn btn-outline focus-ring">Manage Connections</Link>
       </div>
 
       {error && (
@@ -44,9 +39,9 @@ export default function ConfluencePagesPage() {
       )}
 
       {loading ? (
-        <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-6 md:p-8">
-          <div className="h-4 w-28 bg-gray-200 rounded animate-pulse mb-4"></div>
-          <div className="grid gap-5 md:gap-6">
+        <div className="card p-6">
+          <div className="h-4 w-28 bg-gray-200 rounded animate-pulse mb-3"></div>
+          <div className="space-y-3">
             <div className="h-16 bg-gray-100 rounded animate-pulse"></div>
             <div className="h-16 bg-gray-100 rounded animate-pulse"></div>
             <div className="h-16 bg-gray-100 rounded animate-pulse"></div>
@@ -56,32 +51,20 @@ export default function ConfluencePagesPage() {
         <EmptyState
           title="No pages yet"
           description="Connect Confluence and fetch your pages."
-          action={
-            <Link
-              href="/connect"
-              className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#2563EB] text-white hover:bg-blue-600 active:bg-blue-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1"
-            >
-              Connect Confluence
-            </Link>
-          }
+          action={<Link href="/connect" className="btn btn-primary focus-ring">Connect Confluence</Link>}
         />
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((p) => (
-            <article key={p.id} className="rounded-xl border border-gray-100 p-5 md:p-6 hover:shadow-md transition">
+            <article key={p.id} className="list-item p-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xl md:text-2xl font-medium">{p.title}</h3>
+                <h3 className="font-semibold text-base">{p.title}</h3>
                 <span className="badge">{p.space_key}</span>
               </div>
-              <p className="text-sm md:text-base text-gray-700 mb-4 leading-7">Page ID: {p.page_id}</p>
+              <p className="text-sm text-gray-700 mb-4">Page ID: {p.page_id}</p>
               <div className="flex items-center gap-3">
                 {p.url ? (
-                  <a
-                    className="h-11 px-6 rounded-lg bg-white border border-gray-200 text-gray-800 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1 text-sm"
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a className="btn btn-outline focus-ring text-sm" href={p.url} target="_blank" rel="noreferrer">
                     Open
                   </a>
                 ) : null}
