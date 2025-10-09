@@ -64,10 +64,10 @@ function ConnectInner() {
       <section className="mt-20 mb-24 space-y-6">
         <div className="grid md:grid-cols-2 gap-y-10 gap-x-6 md:gap-10">
           {/* JIRA Card */}
-          <article className="card card-tall p-8 transition-all duration-200">
+          <article className="card card-tall p-6 md:p-8 hover:shadow-lg transition-all duration-200">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                <div className="w-12  rounded-lg bg-blue-50 flex items-center justify-center">
                   <span className="text-blue-600 font-bold text-xl">J</span>
                 </div>
                 <div>
@@ -89,7 +89,7 @@ function ConnectInner() {
           </article>
 
           {/* Confluence Card */}
-          <article className="card p-6 hover:shadow-lg transition-all duration-200">
+          <article className="card card-tall p-6 md:p-8 hover:shadow-lg transition-all duration-200">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center">

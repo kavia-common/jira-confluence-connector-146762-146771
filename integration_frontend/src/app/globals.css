@@ -241,5 +241,5 @@ html, body {
 
 /* Utility: Taller card for connection containers */
 .card-tall {
-  min-height: 14rem; /* ~ min-h-56 */
+  min-height: 12rem; /* slightly reduced from ~224px to ~192px for tighter cards */
 }
