@@ -60,9 +60,9 @@ function ConnectInner() {
         />
       )}
 
-      {/* Generous vertical spacing around connection cards: mt-12 mb-14 */}
-      <section className="mt-12 mb-14 space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
+      {/* Enhanced vertical spacing around connection cards: mt-20 mb-24 with increased gaps */}
+      <section className="mt-20 mb-24 space-y-6">
+        <div className="grid md:grid-cols-2 gap-y-10 gap-x-6 md:gap-10">
           {/* JIRA Card */}
           <article className="card p-6 hover:shadow-lg transition-all duration-200">
             <div className="flex items-start justify-between mb-6">
