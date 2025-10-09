@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { buildOAuthLoginUrl } from "@/lib/oauth";
+import { fetchOAuthAuthorizeUrl } from "@/lib/oauth";
 
 /**
  * PUBLIC_INTERFACE
@@ -43,26 +43,21 @@ export default function ConnectJiraButton({
 }) {
   const [loading, setLoading] = useState(false);
 
-  function handleClick() {
+  async function handleClick() {
     try {
       setLoading(true);
       const cb =
         returnUrl ||
-        (typeof window !== "undefined"
-          ? `${window.location.origin}/oauth/jira`
-          : "/oauth/jira");
+        (typeof window !== "undefined" ? `${window.location.origin}/oauth/jira` : "/oauth/jira");
 
-      // Build backend login URL and let the backend issue the 307 redirect to Atlassian.
-      const direct = buildOAuthLoginUrl("jira", cb, state, scope);
-      const u = new URL(
-        direct,
-        typeof window !== "undefined" ? window.location.origin : "http://localhost"
-      );
-      // Ask the backend to perform a redirect (307) instead of returning JSON.
-      u.searchParams.set("redirect", "true");
+      // Fetch Atlassian authorize URL from backend (redirect=false) and navigate to it.
+      const authorizeUrl = await fetchOAuthAuthorizeUrl("jira", {
+        returnUrl: cb,
+        state,
+        scope,
+      });
 
-      // Immediately navigate; the backend will redirect to auth.atlassian.com/authorize...
-      window.location.assign(u.toString());
+      window.location.href = authorizeUrl;
     } catch (err) {
       console.error("Jira connect navigation error:", err);
       setLoading(false);

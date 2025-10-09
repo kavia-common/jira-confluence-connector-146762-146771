@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { buildOAuthLoginUrl } from "@/lib/oauth";
+import { fetchOAuthAuthorizeUrl } from "@/lib/oauth";
 import ConnectJiraButton from "@/components/ConnectJiraButton";
 
 /**
@@ -51,18 +51,32 @@ function ConnectInner() {
    * Start OAuth for Confluence by navigating to backend /auth/confluence/login.
    * We include a return_url hint so backend can send user back to our callback page.
    */
-  function startConfluenceOAuth() {
+  async function startConfluenceOAuth() {
     setLoadingConfluence(true);
     setError(null);
     setSuccessMsg(null);
 
-    const callbackUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/oauth/confluence`
-        : `/oauth/confluence`;
+    try {
+      // return_url should point to frontend (port 3000) for post-callback routing
+      const callbackUrl =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/oauth/confluence`
+          : `/oauth/confluence`;
 
-    const url = buildOAuthLoginUrl("confluence", callbackUrl, "kc-oauth", "read");
-    window.location.assign(url);
+      // Ask backend for Atlassian authorize URL; backend will embed redirect_uri with :3001
+      const authorizeUrl = await fetchOAuthAuthorizeUrl("confluence", {
+        returnUrl: callbackUrl,
+        state: "kc-oauth",
+        scope: "read",
+      });
+
+      // Navigate browser to Atlassian auth URL
+      window.location.href = authorizeUrl;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to start Confluence authorization.";
+      setError(msg);
+      setLoadingConfluence(false);
+    }
   }
 
   return (

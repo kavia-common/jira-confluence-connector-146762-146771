@@ -34,6 +34,12 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 - This frontend expects the backend API described by the provided OpenAPI (FastAPI).
 - Authorization bearer token is stored in localStorage (demo only).
 - Styling uses CSS variables and utility classes aligned with Ocean Professional theme.
+- Backend URL resolution:
+  - If NEXT_PUBLIC_BACKEND_URL is set, it is used.
+  - Otherwise the app builds https://<current-host>:3001 for API calls (so frontend at :3000 talks to backend at :3001).
+- OAuth flow:
+  - Frontend calls backend /auth/{jira|confluence}/login with redirect=false to get JSON { url } and then navigates to that Atlassian URL.
+  - Backend uses redirect_uri on :3001 while return_url points back to the frontend (:3000) for post-callback routing.
 
 ## Module path alias
 
