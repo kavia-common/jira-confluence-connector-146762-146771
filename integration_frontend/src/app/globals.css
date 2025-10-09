@@ -19,14 +19,16 @@
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
-  /* Subtle gradient background per Ocean Professional theme */
-  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.10), rgba(249, 250, 251, 1));
-  background-attachment: fixed;
   color: var(--color-text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Typography scale */
+h1 { line-height: 1.2; }
+h2 { line-height: 1.25; }
+h3 { line-height: 1.3; }
 
 /* Utility classes for theme accents */
 .bg-surface { background-color: var(--color-surface); }
@@ -45,9 +47,8 @@ html, body {
   border-radius: 0.75rem;
   border: 1px solid rgba(17, 24, 39, 0.08);
   box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
-  transition: all 200ms ease-in-out;
+  transition: box-shadow 200ms ease-in-out, transform 200ms ease-in-out;
 }
-
 .card:hover {
   box-shadow: 0 4px 12px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.06);
 }
@@ -59,7 +60,8 @@ html, body {
 }
 
 /* Focus ring for accessibility */
-.focus-ring:focus {
+.focus-ring:focus,
+.focus-ring:focus-visible {
   outline: 2px solid transparent;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
@@ -73,7 +75,7 @@ html, body {
 /* Layout helpers */
 .layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 260px 1fr;
   min-height: calc(100vh - 60px);
 }
 
@@ -97,18 +99,19 @@ html, body {
   border-bottom: 1px solid rgba(17, 24, 39, 0.06);
 }
 
-/* Buttons - Enhanced */
+/* Buttons - Enhanced to match spec */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0 1.5rem;
+  height: 2.75rem; /* ~44px min tap target */
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
   border: 1px solid transparent;
-  transition: all 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out, box-shadow 200ms ease-in-out, transform 150ms ease-out;
   cursor: pointer;
   text-decoration: none;
 }
@@ -122,30 +125,34 @@ html, body {
   background: var(--color-primary);
   color: white;
 }
-.btn-primary:hover:not(:disabled) { 
+.btn-primary:hover:not(:disabled) {
   background: #1d4ed8;
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.btn-primary:active:not(:disabled) {
+  background: #1e40af;
 }
 
 .btn-amber {
   background: var(--color-amber);
   color: white;
 }
-.btn-amber:hover:not(:disabled) { 
+.btn-amber:hover:not(:disabled) {
   background: #d97706;
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+.btn-amber:active:not(:disabled) {
+  background: #b45309;
 }
 
 .btn-outline {
-  background: transparent;
-  color: var(--color-primary);
-  border-color: rgba(37, 99, 235, 0.3);
+  background: white;
+  color: #1f2937;
+  border-color: #e5e7eb;
 }
-.btn-outline:hover:not(:disabled) { 
-  background: rgba(37, 99, 235, 0.06);
-  border-color: rgba(37, 99, 235, 0.5);
+.btn-outline:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
 
 /* Inputs */
@@ -156,7 +163,7 @@ html, body {
   border-radius: 0.5rem;
   background: white;
   font-size: 0.875rem;
-  transition: all 200ms ease-in-out;
+  transition: border-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
 }
 .input:focus {
   border-color: rgba(37, 99, 235, 0.6);
@@ -164,6 +171,7 @@ html, body {
   outline: none;
 }
 
+/* Labels */
 .label {
   font-size: 0.875rem;
   font-weight: 500;
@@ -178,9 +186,9 @@ html, body {
   border-radius: 0.75rem;
   padding: 1.25rem;
   background: white;
-  transition: all 200ms ease-in-out;
+  transition: box-shadow 200ms ease-in-out, transform 150ms ease-out, border-color 200ms ease-in-out;
 }
-.list-item:hover { 
+.list-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   border-color: rgba(37, 99, 235, 0.2);
@@ -208,17 +216,17 @@ html, body {
 
 /* Animations */
 .fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px); 
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -226,7 +234,6 @@ html, body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
 .animate-spin {
   animation: spin 1s linear infinite;
 }
