@@ -3,20 +3,14 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { fetchOAuthAuthorizeUrl } from "@/lib/oauth";
 import ConnectJiraButton from "@/components/ConnectJiraButton";
+import ConnectConfluenceButton from "@/components/ConnectConfluenceButton";
 
 /**
+ * PUBLIC_INTERFACE
  * ConnectPage
- *
- * Starts OAuth by navigating to backend login endpoints:
- * - JIRA:        GET {BACKEND}/auth/jira/login?redirect=true (server 307 -> auth.atlassian.com/authorize)
- * - Confluence:  GET {BACKEND}/auth/confluence/login (direct navigate)
- *
- * Backend redirects the browser to Atlassian, and later to a frontend callback page:
- * - /oauth/jira and /oauth/confluence
- *
- * We surface transient UI state (loading + last outcome) based on query flags after callback.
+ * Simplified connection page for JIRA and Confluence OAuth flows.
+ * Preserves all OAuth button functionality while presenting a cleaner UI.
  */
 export default function ConnectPage() {
   return (
@@ -29,7 +23,6 @@ export default function ConnectPage() {
 function ConnectInner() {
   const params = useSearchParams();
 
-  const [loadingConfluence, setLoadingConfluence] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -47,45 +40,14 @@ function ConnectInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /**
-   * Start OAuth for Confluence by navigating to backend /auth/confluence/login.
-   * We include a return_url hint so backend can send user back to our callback page.
-   */
-  async function startConfluenceOAuth() {
-    setLoadingConfluence(true);
-    setError(null);
-    setSuccessMsg(null);
-
-    try {
-      // return_url should point to frontend (port 3000) for post-callback routing
-      const callbackUrl =
-        typeof window !== "undefined"
-          ? `${window.location.origin}/oauth/confluence`
-          : `/oauth/confluence`;
-
-      // Ask backend for Atlassian authorize URL; backend will embed redirect_uri with :3001
-      // and include a server-generated state. Do not pass client state/scope.
-      const authorizeUrl = await fetchOAuthAuthorizeUrl("confluence", {
-        returnUrl: callbackUrl,
-      });
-
-      // Navigate browser to Atlassian auth URL
-      window.location.href = authorizeUrl;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to start Confluence authorization.";
-      setError(msg);
-      setLoadingConfluence(false);
-    }
-  }
-
   return (
-    <div className="p-6 space-y-6 max-w-screen-lg mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold">Connect Integrations</h1>
-        <p className="text-gray-600 mt-1">
-          Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow.
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      <header>
+        <h1 className="text-2xl font-semibold text-gray-900">Connect Integrations</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Link your Atlassian accounts to access JIRA and Confluence data.
         </p>
-      </div>
+      </header>
 
       {error && (
         <FeedbackAlert type="error" message={error} onClose={() => setError(null)} />
@@ -98,64 +60,62 @@ function ConnectInner() {
         />
       )}
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-4">
         {/* JIRA Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-medium">JIRA</h2>
-              <p className="text-sm text-gray-600">
-                Starts Atlassian OAuth via backend. We will redirect you to Atlassian right away.
-              </p>
+        <article className="card p-5 hover:shadow-lg transition-all duration-200">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-lg">J</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">JIRA</h2>
+                <p className="text-xs text-gray-500">Project Management</p>
+              </div>
             </div>
-            <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
-              Integration
+            <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              OAuth 2.0
             </span>
           </div>
 
-          <div className="mt-4">
-            <ConnectJiraButton
-              onError={(msg) => setError(msg)}
-              idleLabel="Connect Now"
-              loadingLabel="Redirecting..."
-              className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
-              // Note: State is generated by the backend and embedded in the returned Atlassian URL.
-            />
-          </div>
-
-          <div className="mt-3 text-sm text-gray-500">
-            You will be redirected to Atlassian to authorize, then returned here.
-          </div>
-        </div>
+          <ConnectJiraButton
+            onError={(msg) => setError(msg)}
+            idleLabel="Connect JIRA"
+            loadingLabel="Connecting..."
+            className="w-full btn btn-primary focus-ring"
+          />
+        </article>
 
         {/* Confluence Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-medium">Confluence</h2>
-              <p className="text-sm text-gray-600">
-                Starts Atlassian OAuth via backend.
-              </p>
+        <article className="card p-5 hover:shadow-lg transition-all duration-200">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                <span className="text-amber-600 font-bold text-lg">C</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Confluence</h2>
+                <p className="text-xs text-gray-500">Knowledge Base</p>
+              </div>
             </div>
-            <span className="text-xs px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200">
-              Integration
+            <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+              OAuth 2.0
             </span>
           </div>
 
-          <div className="mt-4">
-            <button
-              onClick={startConfluenceOAuth}
-              disabled={loadingConfluence}
-              className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
-            >
-              {loadingConfluence ? "Redirecting..." : "Connect Now"}
-            </button>
-          </div>
+          <ConnectConfluenceButton
+            onError={(msg) => setError(msg)}
+            idleLabel="Connect Confluence"
+            loadingLabel="Connecting..."
+            className="w-full btn btn-amber focus-ring"
+          />
+        </article>
+      </div>
 
-          <div className="mt-3 text-sm text-gray-500">
-            You will be redirected to Atlassian to authorize, then returned here.
-          </div>
-        </div>
+      <div className="text-center">
+        <p className="text-xs text-gray-500">
+          Secure authentication via Atlassian. Your credentials are never stored.
+        </p>
       </div>
     </div>
   );
