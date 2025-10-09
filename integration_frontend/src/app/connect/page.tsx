@@ -28,9 +28,10 @@ function ConnectInner() {
 
   // If user returned here from callback with query flags, surface them.
   useEffect(() => {
-    const status = params.get("status");
-    const provider = params.get("provider");
-    const message = params.get("message");
+    const sp = params;
+    const status = sp?.get("status");
+    const provider = sp?.get("provider");
+    const message = sp?.get("message");
 
     if (status === "success" && provider) {
       setSuccessMsg(`${provider === "jira" ? "JIRA" : "Confluence"} connected successfully.`);

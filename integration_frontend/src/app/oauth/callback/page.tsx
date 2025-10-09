@@ -37,9 +37,10 @@ function OAuthCallbackRouterInner() {
   const params = useSearchParams();
 
   useEffect(() => {
-    const provider = params.get("provider");
-    const status = params.get("status") || "success";
-    const message = params.get("message") || "";
+    const sp = params;
+    const provider = sp?.get("provider") || "";
+    const status = sp?.get("status") || "success";
+    const message = sp?.get("message") || "";
 
     // Build query string to preserve status/message when forwarding
     const qs = new URLSearchParams();

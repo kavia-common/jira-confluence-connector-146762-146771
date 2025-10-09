@@ -17,10 +17,10 @@ export default function Home() {
     <div className="max-w-7xl mx-auto pt-12 pb-16 px-6 md:px-10 lg:px-16 space-y-12">
       {/* Hero Section */}
       <section className="rounded-2xl p-8 md:p-10 bg-gradient-to-r from-blue-500/10 via-white to-amber-100/20 border border-gray-100 shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-3xl p-4 md:text-4xl font-semibold tracking-tight text-gray-900">
           Your Integration Hub
         </h1>
-        <p className="mt-2 text-gray-600/80 text-base leading-7">
+        <p className="mt-2 p-4 text-gray-600/80 text-base leading-7">
           Seamlessly connect and reference JIRA projects and Confluence pages from one unified platform.
         </p>
       </section>

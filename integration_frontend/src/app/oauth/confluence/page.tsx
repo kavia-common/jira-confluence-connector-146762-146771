@@ -25,8 +25,9 @@ function ConfluenceOAuthCallbackInner() {
   const [message, setMessage] = useState<string>("Finalizing authorization...");
 
   useEffect(() => {
-    const error = params.get("error");
-    const msg = params.get("message");
+    const sp = params;
+    const error = sp?.get("error");
+    const msg = sp?.get("message");
 
     if (error) {
       setStatus("error");
