@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Topbar />
         <div className="layout">
           <Sidebar />
-          <main className="p-4 overflow-y-auto">{children}</main>
+          <main className="overflow-y-auto">{children}</main>
         </div>
       </body>
     </html>

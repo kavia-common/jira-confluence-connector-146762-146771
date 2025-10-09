@@ -102,13 +102,14 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
+  height: 2.75rem; /* h-11 */
+  padding-left: 1.5rem; /* px-6 */
+  padding-right: 1.5rem; /* px-6 */
+  border-radius: 0.5rem; /* rounded-lg */
   font-size: 0.875rem;
   font-weight: 500;
   border: 1px solid transparent;
-  transition: all 200ms ease-in-out;
+  transition: color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out;
   cursor: pointer;
   text-decoration: none;
 }
@@ -118,34 +119,41 @@ html, body {
   cursor: not-allowed;
 }
 
+/* Primary Button */
 .btn-primary {
-  background: var(--color-primary);
+  background-color: #2563EB; /* bg-[#2563EB] which is blue-600 */
   color: white;
 }
-.btn-primary:hover:not(:disabled) { 
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+.btn-primary:hover:not(:disabled) {
+  background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+.btn-primary:active:not(:disabled) {
+  background-color: #1e40af; /* active:bg-blue-800 */
 }
 
+/* Amber/Accent Button */
 .btn-amber {
-  background: var(--color-amber);
+  background-color: var(--color-amber);
   color: white;
 }
-.btn-amber:hover:not(:disabled) { 
-  background: #d97706;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+.btn-amber:hover:not(:disabled) {
+  background-color: #d97706; /* darken amber */
+}
+.btn-amber:active:not(:disabled) {
+  background-color: #b45309; /* darker amber */
 }
 
+/* Secondary Button (replaces .btn-outline) */
+.btn-secondary,
 .btn-outline {
-  background: transparent;
-  color: var(--color-primary);
-  border-color: rgba(37, 99, 235, 0.3);
+  background-color: white;
+  color: #1f2937; /* text-gray-800 */
+  border: 1px solid #e5e7eb; /* border-gray-200 */
 }
-.btn-outline:hover:not(:disabled) { 
-  background: rgba(37, 99, 235, 0.06);
-  border-color: rgba(37, 99, 235, 0.5);
+.btn-secondary:hover:not(:disabled),
+.btn-outline:hover:not(:disabled) {
+  background-color: #f9fafb; /* hover:bg-gray-50 */
+  border-color: #d1d5db; /* hover:border-gray-300 */
 }
 
 /* Inputs */
