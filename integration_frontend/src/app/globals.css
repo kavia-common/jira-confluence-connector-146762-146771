@@ -239,7 +239,7 @@ html, body {
   animation: spin 1s linear infinite;
 }
 
-/* Utility: Taller card for connection containers (slightly tighter, now ~8.875rem) */
+/* Utility: Taller card for connection containers (slightly tighter, now ~8.625rem) */
 .card-tall {
-  min-height: 8.875rem; /* reduced further from ~10.5rem (~168px) to ~8.875rem (~142px) */
+  min-height: 8.625rem; /* reduced further from ~10.5rem (~168px) to ~8.625rem (~138px) */
 }
