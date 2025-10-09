@@ -238,3 +238,8 @@ html, body {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Utility: Taller card for connection containers */
+.card-tall {
+  min-height: 14rem; /* ~ min-h-56 */
+}
