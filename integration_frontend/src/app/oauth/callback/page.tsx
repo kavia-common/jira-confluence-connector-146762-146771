@@ -4,12 +4,8 @@
  * PUBLIC_INTERFACE
  * OAuthCallbackRouter
  * Handles the generic /oauth/callback redirect coming from the backend.
- * It reads ?provider=<jira|confluence>&status=<success|error>&message=... and
- * forwards to the corresponding provider-specific page already implemented:
- *  - /oauth/jira
- *  - /oauth/confluence
- *
- * This prevents 404s if the backend redirects to /oauth/callback as documented.
+ * It reads ?provider=<jira|confluence>&status=<success|error>&message=... and forwards
+ * without exposing or logging any sensitive data (no state/CSRF shown).
  */
 import React, { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -42,7 +38,8 @@ function OAuthCallbackRouterInner() {
     const status = sp?.get("status") || "success";
     const message = sp?.get("message") || "";
 
-    // Build query string to preserve status/message when forwarding
+    // Build query string to preserve status/message when forwarding.
+    // Do not include or render any sensitive parameters like state or CSRF.
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
     if (message) qs.set("message", message);
