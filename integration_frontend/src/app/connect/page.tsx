@@ -65,10 +65,10 @@ function ConnectInner() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-lg mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold">Connect Integrations</h1>
-        <p className="text-gray-600 mt-1">
+    <div className="space-y-6 max-w-screen-lg mx-auto">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold leading-8">Connect Integrations</h1>
+        <p className="text-gray-600 text-sm leading-6">
           Connect to your JIRA and Confluence accounts. Clicking Connect Now will open the backend OAuth login flow.
         </p>
       </div>
@@ -84,13 +84,13 @@ function ConnectInner() {
         />
       )}
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-6 md:gap-8">
         {/* JIRA Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="card p-4 md:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-medium">JIRA</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-lg font-medium leading-7">JIRA</h2>
+              <p className="text-sm text-gray-600 leading-6">
                 Starts Atlassian OAuth via backend.
               </p>
             </div>
@@ -103,23 +103,23 @@ function ConnectInner() {
             <button
               onClick={() => startOAuth("jira")}
               disabled={loading === "jira"}
-              className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 transition"
+              className="w-full btn btn-primary focus-ring"
             >
               {loading === "jira" ? "Redirecting..." : "Connect Now"}
             </button>
           </div>
 
-          <div className="mt-3 text-sm text-gray-500">
+          <div className="mt-3 text-sm text-gray-500 leading-6">
             You will be redirected to Atlassian to authorize, then returned here.
           </div>
         </div>
 
         {/* Confluence Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="card p-4 md:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-medium">Confluence</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-lg font-medium leading-7">Confluence</h2>
+              <p className="text-sm text-gray-600 leading-6">
                 Starts Atlassian OAuth via backend.
               </p>
             </div>
@@ -132,13 +132,13 @@ function ConnectInner() {
             <button
               onClick={() => startOAuth("confluence")}
               disabled={loading === "confluence"}
-              className="w-full inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-white hover:bg-amber-600 disabled:opacity-60 transition"
+              className="w-full btn btn-amber focus-ring"
             >
               {loading === "confluence" ? "Redirecting..." : "Connect Now"}
             </button>
           </div>
 
-          <div className="mt-3 text-sm text-gray-500">
+          <div className="mt-3 text-sm text-gray-500 leading-6">
             You will be redirected to Atlassian to authorize, then returned here.
           </div>
         </div>

@@ -21,9 +21,9 @@ export default function OAuthCallbackRouter() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 max-w-screen-md mx-auto">
-          <h1 className="text-2xl font-semibold mb-3">Finalizing authorization...</h1>
-          <p className="text-sm text-gray-700">Redirecting you to the appropriate page.</p>
+        <div className="p-6 max-w-screen-md mx-auto space-y-2">
+          <h1 className="text-2xl font-semibold leading-8">Finalizing authorization...</h1>
+          <p className="text-sm text-gray-700 leading-6">Redirecting you to the appropriate page.</p>
         </div>
       }
     >
@@ -63,9 +63,9 @@ function OAuthCallbackRouterInner() {
   }, [params, router]);
 
   return (
-    <div className="p-6 max-w-screen-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-3">Finalizing authorization...</h1>
-      <p className="text-sm text-gray-700">Redirecting you to the appropriate page.</p>
+    <div className="p-6 max-w-screen-md mx-auto space-y-2">
+      <h1 className="text-2xl font-semibold leading-8">Finalizing authorization...</h1>
+      <p className="text-sm text-gray-700 leading-6">Redirecting you to the appropriate page.</p>
     </div>
   );
 }

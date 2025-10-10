@@ -9,27 +9,27 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="max-w-screen-2xl mx-auto">
-      <section className="grid md:grid-cols-3 gap-4 mb-4">
-        <div className="card p-4">
-          <h3 className="text-sm font-semibold mb-1">JIRA Projects</h3>
-          <p className="text-sm text-gray-600 mb-3">View synced JIRA projects.</p>
-          <Link href="/jira" className="btn btn-primary focus-ring inline-block">Open Projects</Link>
+      <section className="grid md:grid-cols-3 gap-6 md:gap-8 mb-6 md:mb-8">
+        <div className="card p-4 md:p-6">
+          <h3 className="text-base font-semibold leading-6 mb-2">JIRA Projects</h3>
+          <p className="text-sm text-gray-600 leading-6 mb-4">View synced JIRA projects.</p>
+          <Link href="/jira" className="btn btn-primary focus-ring inline-flex">Open Projects</Link>
         </div>
-        <div className="card p-4">
-          <h3 className="text-sm font-semibold mb-1">Confluence Pages</h3>
-          <p className="text-sm text-gray-600 mb-3">Access synced Confluence pages.</p>
-          <Link href="/confluence" className="btn btn-primary focus-ring inline-block">Open Pages</Link>
+        <div className="card p-4 md:p-6">
+          <h3 className="text-base font-semibold leading-6 mb-2">Confluence Pages</h3>
+          <p className="text-sm text-gray-600 leading-6 mb-4">Access synced Confluence pages.</p>
+          <Link href="/confluence" className="btn btn-primary focus-ring inline-flex">Open Pages</Link>
         </div>
-        <div className="card p-4">
-          <h3 className="text-sm font-semibold mb-1">Connections</h3>
-          <p className="text-sm text-gray-600 mb-3">Manage provider connections.</p>
-          <Link href="/connect" className="btn btn-amber focus-ring inline-block">Connect</Link>
+        <div className="card p-4 md:p-6">
+          <h3 className="text-base font-semibold leading-6 mb-2">Connections</h3>
+          <p className="text-sm text-gray-600 leading-6 mb-4">Manage provider connections.</p>
+          <Link href="/connect" className="btn btn-amber focus-ring inline-flex">Connect</Link>
         </div>
       </section>
 
-      <div className="card p-4">
-        <h3 className="text-sm font-semibold mb-2">Welcome</h3>
-        <p className="text-sm text-gray-700">
+      <div className="card p-4 md:p-6 gradient-surface">
+        <h3 className="text-base font-semibold leading-6 mb-3">Welcome</h3>
+        <p className="text-sm text-gray-700 leading-6">
           This application is publicly accessible. Use the sidebar to navigate projects, pages, or manage connections.
         </p>
       </div>

@@ -20,13 +20,13 @@ export default function FeedbackAlert({
 
   return (
     <div
-      className={`fade-in border ${styles} px-3 py-2 rounded-md text-sm flex items-start justify-between`}
+      className={`fade-in border ${styles} px-4 py-3 rounded-md text-sm leading-6 flex items-start justify-between`}
       role="status"
       aria-live="polite"
     >
       <div>{message}</div>
       {onClose && (
-        <button className="ml-3 text-xs underline" onClick={onClose} aria-label="Dismiss">
+        <button className="ml-4 text-xs underline focus-ring" onClick={onClose} aria-label="Dismiss">
           Dismiss
         </button>
       )}

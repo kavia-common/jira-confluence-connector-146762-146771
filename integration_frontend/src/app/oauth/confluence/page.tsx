@@ -44,15 +44,15 @@ function ConfluenceOAuthCallbackInner() {
   }, []);
 
   return (
-    <div className="p-6 max-w-screen-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-3">Confluence Authorization</h1>
+    <div className="p-6 max-w-screen-md mx-auto space-y-3">
+      <h1 className="text-2xl font-semibold leading-8">Confluence Authorization</h1>
       {status === "error" ? (
         <FeedbackAlert type="error" message={message} />
       ) : (
         <FeedbackAlert type="success" message={message} />
       )}
       {status === "error" ? (
-        <div className="mt-4">
+        <div>
           <button
             className="btn btn-outline focus-ring"
             onClick={() =>
@@ -65,7 +65,7 @@ function ConfluenceOAuthCallbackInner() {
           </button>
         </div>
       ) : (
-        <div className="mt-4">
+        <div>
           <button
             className="btn btn-outline focus-ring"
             onClick={() =>
