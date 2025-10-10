@@ -10,7 +10,9 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 2. Configure environment
    - Create a .env.local file and set:
      - NEXT_PUBLIC_BACKEND_URL=https://vscode-internal-14593-beta.beta01.cloud.kavia.ai:3001
-   - If omitted, the app will call the backend via same origin.
+     - NEXT_PUBLIC_JIRA_REDIRECT_URI=https://vscode-internal-37302-beta.beta01.cloud.kavia.ai:3001/auth/jira/callback
+   - If omitted, the app will call the backend via same origin and will default the Jira redirect URI to the value above.
+   - Note: The backend is authoritative for redirect_uri during the OAuth flow and reads JIRA_REDIRECT_URI (preferred) or falls back to the same default.
 
 3. Run
    - npm run dev
