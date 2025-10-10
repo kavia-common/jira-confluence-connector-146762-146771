@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";
-import { buildOAuthLoginUrl } from "@/lib/oauth";
+import { getJiraLoginUrl, getConfluenceLoginUrl } from "@/lib/oauth";
 
 /**
  * ConnectPage
@@ -12,8 +12,7 @@ import { buildOAuthLoginUrl } from "@/lib/oauth";
  * - JIRA:        GET {BACKEND}/auth/jira/login
  * - Confluence:  GET {BACKEND}/auth/confluence/login
  *
- * Backend redirects the browser to Atlassian, and later to a frontend callback page:
- * - /oauth/jira and /oauth/confluence
+ * Backend redirects the browser to Atlassian; frontend does not craft authorize URLs.
  *
  * We surface transient UI state (loading + last outcome) based on query flags after callback.
  */
@@ -48,19 +47,15 @@ function ConnectInner() {
 
   /**
    * Start OAuth: redirect the browser to backend /auth/<provider>/login.
-   * We include a return_url hint so backend can send user back to our callback page.
+   * No custom state/scope/return_url are appended from the client.
    */
   function startOAuth(provider: "jira" | "confluence") {
     setLoading(provider);
     setError(null);
     setSuccessMsg(null);
 
-    const callbackUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/oauth/${provider}`
-        : `/oauth/${provider}`;
-
-    const url = buildOAuthLoginUrl(provider, callbackUrl, "kc-oauth", "read");
+    const url = provider === "jira" ? getJiraLoginUrl() : getConfluenceLoginUrl();
+    // Prefer simple browser navigation so cookies and redirects work seamlessly.
     window.location.href = url;
   }
 
