@@ -8,12 +8,14 @@ export default function SettingsPage() {
 
   useEffect(() => {
     try {
+      // Safe to log base URL for diagnostics; never log tokens or CSRF.
       console.log("[Settings] getApiBaseUrl() resolved to:", baseUrl || "(same origin)");
       const buildTimeEnv =
         typeof process !== "undefined" && (process as unknown as { env?: Record<string, string | undefined> }).env
           ? (process as unknown as { env: Record<string, string | undefined> }).env["NEXT_PUBLIC_BACKEND_URL"]
           : undefined;
       console.log("[Settings] NEXT_PUBLIC_BACKEND_URL (build-time):", buildTimeEnv);
+      // Guardrail: If you add new network calls here, DO NOT render or log raw JSON bodies that may include CSRF or secrets.
     } catch {
       // ignore
     }

@@ -1,5 +1,6 @@
 "use client";
 
+// Never log or render OAuth state/CSRF in this page.
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FeedbackAlert from "@/components/FeedbackAlert";

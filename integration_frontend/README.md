@@ -41,6 +41,10 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
   - Frontend calls backend /auth/{jira|confluence}/login with redirect=false to get JSON { url } and then navigates to that Atlassian URL.
   - The returned Atlassian URL already includes a server-generated state. Do not pass or override `state` from the frontend.
   - Backend uses redirect_uri on :3001 while return_url points back to the frontend (:3000) for post-callback routing.
+- CSRF handling policy:
+  - CSRF tokens are fetched via src/lib/auth.fetchCsrfToken(), stored only in memory (see src/lib/csrf.ts), and never rendered or logged.
+  - Login POST sends the token via X-CSRF-Token header (see src/lib/auth.loginWithCredentials()).
+  - Do not render raw JSON from CSRF endpoints or echo bodies that may contain { csrf }.
 
 ## Module path alias
 

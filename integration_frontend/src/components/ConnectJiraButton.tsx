@@ -50,7 +50,7 @@ export default function ConnectJiraButton({
 
       window.location.href = authorizeUrl;
     } catch (err) {
-      console.error("Jira connect navigation error:", err);
+      // Avoid logging sensitive details to console in production.
       setLoading(false);
       const message =
         err instanceof Error ? err.message : "Failed to start Jira authorization.";

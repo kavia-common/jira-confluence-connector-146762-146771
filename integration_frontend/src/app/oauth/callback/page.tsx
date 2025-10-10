@@ -6,6 +6,8 @@
  * Handles the generic /oauth/callback redirect coming from the backend.
  * It reads ?provider=<jira|confluence>&status=<success|error>&message=... and forwards
  * without exposing or logging any sensitive data (no state/CSRF shown).
+ *
+ * Security guardrail: Do NOT console.log query params here; never render OAuth state or CSRF.
  */
 import React, { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";

@@ -15,21 +15,25 @@ import { fetchCsrfToken, loginWithCredentials } from "@/lib/auth";
  * - On mount, prefetch CSRF.
  * - Submit via fetch; on success redirect to "/".
  * - No console.log of CSRF or auth state.
+ *
+ * Security footgun safeguard:
+ * - Do not render JSON from /auth/csrf or /login responses. Avoid {JSON.stringify(data)} patterns here.
+ * - Do not console.log sensitive auth responses or the CSRF token.
  */
 export default function LoginPage() {
   const router = useRouter();
-  const [csrf, setCsrf] = useState<string>("");
+  const [csrfReady, setCsrfReady] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // Prefetch CSRF token
+  // Prefetch CSRF token and store in memory via auth helper.
   useEffect(() => {
     let mounted = true;
     fetchCsrfToken()
-      .then((t) => {
-        if (mounted) setCsrf(t);
+      .then(() => {
+        if (mounted) setCsrfReady(true);
       })
       .catch((e) => {
         // Show generic error; do not leak token/state.
@@ -45,8 +49,8 @@ export default function LoginPage() {
     setError("");
     setPending(true);
     try {
-      const res = await loginWithCredentials({ email, password, csrf });
-      // Redirect to root if ok, or to provided redirectUrl.
+      // auth.ts will pick up CSRF from in-memory store if not provided.
+      const res = await loginWithCredentials({ email, password });
       router.replace(res.redirectUrl || "/");
     } catch (err) {
       setPending(false);
@@ -66,9 +70,8 @@ export default function LoginPage() {
         {error ? <FeedbackAlert type="error" message={error} onClose={() => setError("")} /> : null}
 
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
-          {/* Hidden CSRF input is optional if the backend expects the header only.
-              We keep it to support traditional form backends while still sending a header in JS. */}
-          <input type="hidden" name="csrf" value={csrf} readOnly />
+          {/* Hidden CSRF field intentionally omitted from DOM to avoid accidental exposure.
+              Backend expects header X-CSRF-Token sent from JS. */}
 
           <div>
             <label htmlFor="email" className="label">Email</label>
@@ -106,7 +109,7 @@ export default function LoginPage() {
           <button
             type="submit"
             className="btn btn-primary focus-ring w-full"
-            disabled={pending || !csrf}
+            disabled={pending || !csrfReady}
             aria-busy={pending ? "true" : "false"}
           >
             {pending ? "Signing in..." : "Sign in"}

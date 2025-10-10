@@ -60,6 +60,7 @@ export default function Home() {
             onReferenceSelected={(ref) => {
               setPicked((prev) => [ref, ...prev].slice(0, 6));
               try {
+                // Safe to log non-sensitive selection; avoid logging any auth or CSRF related info.
                 console.log("[ChatInput] Reference selected:", ref);
               } catch {/* noop */}
             }}

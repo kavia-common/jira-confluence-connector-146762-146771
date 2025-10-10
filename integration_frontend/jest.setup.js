@@ -15,3 +15,6 @@ if (typeof globalThis.fetch === "undefined") {
   globalThis.fetch = (..._args) =>
     Promise.reject(new Error("Fetch not mocked in this test"));
 }
+
+// Test guardrail: Consider asserting that UI does not render strings like `"csrf"` or tokens.
+// Keep in mind false positives; prefer targeted tests around login and callback pages.

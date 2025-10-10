@@ -50,7 +50,7 @@ export default function ConnectConfluenceButton({
 
       window.location.href = authorizeUrl;
     } catch (err) {
-      console.error("Confluence connect navigation error:", err);
+      // Avoid logging sensitive details to console in production.
       setLoading(false);
       const message =
         err instanceof Error ? err.message : "Failed to start Confluence authorization.";
