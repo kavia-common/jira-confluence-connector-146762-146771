@@ -52,8 +52,9 @@ Modern dashboard UI for JIRA–Confluence integration following the Ocean Profes
 - If you see "Module not found: Can't resolve '@/...'", ensure you are importing from `@/` and that the file exists under `src/`.
 - Shared helpers for backend calls are exposed under:
   - `@/lib/api` (buildBackendUrl, getApiBaseUrl, fetchJiraProjects, fetchConfluencePages)
-  - `@/lib/oauth` (buildOAuthLoginUrl)
+  - `@/lib/oauth` (fetchOAuthAuthorizeUrl)
   - `@/lib/connectorsClient` (searchConnector, quickCreateConnector)
+  - `@/lib/auth` (fetchCsrfToken, getCsrfToken, loginWithCredentials)
 
 ## Environment
 
